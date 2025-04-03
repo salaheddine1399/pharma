@@ -1,10 +1,15 @@
+"use client";
+
+import { useState } from "react";
 import { Menu, Pen, Scan } from "lucide-react";
 
 import ActionCard from "@/components/action-card";
 import Image from "next/image";
 import UserAvatar from "@/components/user-avatar";
+import Sidebar from "@/components/sidebar";
 
 export default function Analyse() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <main className="min-h-screen bg-[#f8fbf8]">
       {/* Header */}
@@ -21,7 +26,7 @@ export default function Analyse() {
         </div>
         <div className="flex items-center gap-4">
           <UserAvatar initials="TA" />
-          <button aria-label="Menu">
+          <button aria-label="Menu" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-6 w-6" />
           </button>
         </div>
@@ -62,6 +67,9 @@ export default function Analyse() {
           className="mr-2 object-contain"
         />
       </div>
+
+      {/* Sidebar */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </main>
   );
 }
