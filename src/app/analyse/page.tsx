@@ -47,7 +47,7 @@ export default function Analyse() {
             icon={Pen}
             title="Saisir des médicaments"
             description="Saisissez vos médicaments prescrits à la main pour vérifier les risques potentiels et garantir l'exactitude des informations."
-            href="/saisir-meds"
+            href="/add-profile"
           />
 
           <ActionCard

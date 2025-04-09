@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function PatientProfileForm() {
   const [pathologies, setPathologies] = useState({
@@ -153,9 +154,11 @@ export default function PatientProfileForm() {
         >
           Ignorer
         </Button>
-        <Button className="bg-emerald-700 hover:bg-emerald-800">
-          Ajouter profil de patient <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
+        <Link href="/saisir-med">
+          <Button className="bg-emerald-700 hover:bg-emerald-800">
+            Ajouter profil de patient <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </Link>
       </div>
     </div>
   );
