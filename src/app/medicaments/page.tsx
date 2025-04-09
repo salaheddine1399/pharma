@@ -3,6 +3,7 @@ import Sidebar from "@/components/sidebar";
 import UserAvatar from "@/components/user-avatar";
 import { Menu, Search } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function MedicamentsPage() {
@@ -100,7 +101,7 @@ export default function MedicamentsPage() {
               </p>
             </div>
             <button className="bg-[#3d8b78] text-white px-4 py-2 rounded-md hover:bg-[#347a68]">
-              Plus d’informations →
+              <Link href={`/medicaments/${index}`}>Plus d’informations →</Link>
             </button>
           </div>
         ))}
