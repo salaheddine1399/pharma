@@ -47,12 +47,14 @@ export default function Analyse() {
             icon={Pen}
             title="Saisir des médicaments"
             description="Saisissez vos médicaments prescrits à la main pour vérifier les risques potentiels et garantir l'exactitude des informations."
+            href="/saisir-meds"
           />
 
           <ActionCard
             icon={Scan} // Updated to use Scan icon instead of Maximize
             title="Scanner une ordonnance"
             description="Utilisez la fonction de scan pour vérifier rapidement les risques associés à votre ordonnance."
+            href="/scanner"
           />
         </div>
       </section>
