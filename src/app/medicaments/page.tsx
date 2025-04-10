@@ -1,13 +1,39 @@
 "use client";
+
 import Sidebar from "@/components/sidebar";
 import UserAvatar from "@/components/user-avatar";
 import { Menu, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import supabase from "@/lib/supabase"; // Import Supabase client
 
 export default function MedicamentsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [medicaments, setMedicaments] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 10;
+
+  // Fetch medicaments with pagination
+  const fetchMedicaments = async (page: number) => {
+    const { data, count, error } = await supabase
+      .from("medicaments")
+      .select("*", { count: "exact" })
+      .range((page - 1) * pageSize, page * pageSize - 1);
+
+    if (error) {
+      console.error("Error fetching data: ", error);
+    } else {
+      setMedicaments(data || []);
+      setTotalPages(Math.ceil(count! / pageSize));
+    }
+  };
+
+  // Run the fetch when the page is loaded or when the currentPage changes
+  useEffect(() => {
+    fetchMedicaments(currentPage);
+  }, [currentPage]);
 
   return (
     <div className="min-h-screen bg-[#EEF7F2]">
@@ -56,55 +82,64 @@ export default function MedicamentsPage() {
         />
       </div>
 
-      {/* Results */}
-
+      {/* Medicaments Results */}
       <div className="p-6">
-        <h3 className="text-xl font-bold">Résultats (2)</h3>
+        <h3 className="text-xl font-bold">Résultats ({medicaments.length})</h3>
         <p className="text-gray-500 text-sm">
           Voici les médicaments avec leurs informations
         </p>
 
-        {[
-          {
-            name: "LANZOPOMP 30 mg",
-            img: "https://www.pharmnet-dz.com/ImageHandler.ashx?imageurl=/img/medics/6273.png",
-            dci: "LANSOPRAZOLE",
-            lab: "WORLD MEDECINE",
-            therapeutic: "GASTRO-ENTEROLOGIE",
-          },
-          {
-            name: "LANZOMED 30 mg",
-            img: "https://www.pharmnet-dz.com/ImageHandler.ashx?imageurl=/img/medics/6273.png",
-            dci: "LANSOPRAZOLE",
-            lab: "WORLD MEDECINE",
-            therapeutic: "GASTRO-ENTEROLOGIE",
-          },
-        ].map((med, index) => (
+        {medicaments.map((med, index) => (
           <div
-            key={index}
+            key={med.code}
             className="mt-4 p-4 bg-white rounded-lg shadow-md flex items-center gap-4"
           >
             <img
-              src={med.img}
-              alt={med.name}
+              src={med.image_url || "/default-image.png"} // Add your own logic for image
+              alt={med.denomination_du_medicament}
               className="h-24 w-24 rounded-md"
             />
             <div className="flex-1">
               <h4 className="font-semibold text-lg text-[#184C42]">
-                {med.name}
+                {med.denomination_du_medicament}
               </h4>
               <p className="text-sm text-gray-500">
-                DCI: {med.dci} - Laboratoire: {med.lab}
+                DCI: {med.composition_qualitative_et_quantitative}
               </p>
               <p className="text-sm text-gray-500">
-                C. Thérapeutique: {med.therapeutic}
+                C. Thérapeutique: {med.indications_therapeutiques}
               </p>
             </div>
             <button className="bg-[#3d8b78] text-white px-4 py-2 rounded-md hover:bg-[#347a68]">
-              <Link href={`/medicaments/${index}`}>Plus d’informations →</Link>
+              <Link href={`/medicaments/${med.code}`}>
+                Plus d’informations →
+              </Link>
             </button>
           </div>
         ))}
+
+        {/* Pagination Controls */}
+        <div className="mt-6 flex justify-center">
+          <button
+            className="px-4 py-2 bg-[#3d8b78] text-white rounded-md hover:bg-[#347a68]"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span className="mx-4 text-lg">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            className="px-4 py-2 bg-[#3d8b78] text-white rounded-md hover:bg-[#347a68]"
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
 
       {/* Sidebar */}
