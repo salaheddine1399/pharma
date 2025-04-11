@@ -13,13 +13,44 @@ export default function MedicamentsPage() {
   const [medicaments, setMedicaments] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState(""); // Search query state
   const pageSize = 10;
 
+  const cleanMedicamentName = (name: string) => {
+    const match = name.match(/^[^,()]+/); // Match the name before any comma or parenthesis
+    return match ? match[0].trim() : name; // Return cleaned name
+  };
+
+  // Function to clean the composition field and remove everything after the dots
+  const cleanComposition = (composition: string) => {
+    const match = composition.match(/^[^\.]+/); // Match everything before the first dot
+    return match ? match[0].trim() : composition; // Return the cleaned composition or the original composition if no match
+  };
+
+  const extractClassePharmaco = (pharmacodynamicsText: string) => {
+    // Regex: Match everything after "Classe pharmacothérapeutique:" until a comma, colon, semicolon, or parentheses
+    const match = pharmacodynamicsText.match(
+      /Classe pharmacothérapeutique\s*[:|-]?\s*([^,;:\)\n]+)/
+    );
+
+    return match ? match[1].trim() : "Non disponible"; // Return the cleaned class or a default message
+  };
+
+  const extractCodeAtc = (pharmacodynamicsText: string) => {
+    // Use regex to capture the Code ATC after "Code ATC :"
+    const match = pharmacodynamicsText.match(
+      /Code ATC\s*[:|-]?\s*([A-Za-z0-9]+)/
+    );
+    return match ? match[1].trim() : "Non disponible"; // Return the cleaned Code ATC or a default message
+  };
+
   // Fetch medicaments with pagination
-  const fetchMedicaments = async (page: number) => {
+  const fetchMedicaments = async (page: number, query: string) => {
     const { data, count, error } = await supabase
       .from("medicaments")
       .select("*", { count: "exact" })
+      .ilike("denomination_du_medicament", `%${query}%`) // Search by medicament name
+      .or(`composition_qualitative_et_quantitative.ilike.%${query}%`) // Search by DCI (composition)
       .range((page - 1) * pageSize, page * pageSize - 1);
 
     if (error) {
@@ -32,8 +63,13 @@ export default function MedicamentsPage() {
 
   // Run the fetch when the page is loaded or when the currentPage changes
   useEffect(() => {
-    fetchMedicaments(currentPage);
-  }, [currentPage]);
+    fetchMedicaments(currentPage, searchQuery);
+  }, [currentPage, searchQuery]);
+
+  // Handle the search input change
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
 
   return (
     <div className="min-h-screen bg-[#EEF7F2]">
@@ -70,6 +106,8 @@ export default function MedicamentsPage() {
               type="text"
               placeholder="Médicament/DCI"
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3d8b78]"
+              value={searchQuery} // Bind the input value to the search query state
+              onChange={handleSearchChange} // Update the search query on input change
             />
           </div>
         </div>
@@ -83,63 +121,109 @@ export default function MedicamentsPage() {
       </div>
 
       {/* Medicaments Results */}
-      <div className="p-6">
-        <h3 className="text-xl font-bold">Résultats ({medicaments.length})</h3>
-        <p className="text-gray-500 text-sm">
+      <div className="px-12 py-4">
+        <h2 className="text-xl font-bold">Résultats ({medicaments.length})</h2>
+        <p className="text-gray-500 text-sm mb-6">
           Voici les médicaments avec leurs informations
         </p>
 
-        {medicaments.map((med, index) => (
-          <div
-            key={med.code}
-            className="mt-4 p-4 bg-white rounded-lg shadow-md flex items-center gap-4"
-          >
-            <img
-              src={med.image_url || "/default-image.png"} // Add your own logic for image
-              alt={med.denomination_du_medicament}
-              className="h-24 w-24 rounded-md"
-            />
-            <div className="flex-1">
-              <h4 className="font-semibold text-lg text-[#184C42]">
-                {med.denomination_du_medicament}
-              </h4>
-              <p className="text-sm text-gray-500">
-                DCI: {med.composition_qualitative_et_quantitative}
-              </p>
-              <p className="text-sm text-gray-500">
-                C. Thérapeutique: {med.indications_therapeutiques}
-              </p>
+        <div className="space-y-4">
+          {medicaments.map((med) => (
+            <div
+              key={med.code}
+              className="bg-white rounded-lg shadow-sm overflow-hidden flex"
+            >
+              <div className="w-50 h-50 flex-shrink-0 bg-gray-100 flex items-center justify-center p-4">
+                <img
+                  src={med.image_url || "/default-img.jpg"}
+                  alt={cleanMedicamentName(med.denomination_du_medicament)}
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+
+              <div className="flex-1 p-5">
+                <h3 className="text-xl font-bold text-[#388075]">
+                  {cleanMedicamentName(med.denomination_du_medicament)}
+                </h3>
+
+                <div className="mt-3 space-y-1.5">
+                  <div className="flex">
+                    <span className="text-gray-500 w-64">DCI:</span>
+                    <span className="font-medium">
+                      {cleanComposition(
+                        med.composition_qualitative_et_quantitative
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="flex">
+                    <span className="text-gray-500 w-64">Code ATC:</span>
+                    <span className="font-medium">
+                      {extractCodeAtc(med.proprietes_pharmacodynamiques || "")}
+                    </span>
+                  </div>
+
+                  <div className="flex">
+                    <span className="text-gray-500 w-64">
+                      Classe pharmacothérapeutique:
+                    </span>
+                    <span className="font-medium">
+                      {extractClassePharmaco(
+                        med.proprietes_pharmacodynamiques || ""
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="flex">
+                    <span className="text-gray-500 w-64">
+                      Forme Pharmaceutique:
+                    </span>
+                    <span className="font-medium">
+                      {med.forme_pharmaceutique}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center p-5">
+                <Link
+                  href={`/medicaments/${med.code}`}
+                  className="bg-[#388075] hover:bg-[#2D6A62] text-white px-4 py-2 rounded flex items-center gap-2 transition-colors whitespace-nowrap"
+                >
+                  <span>Plus d'informations</span>
+                  <span>→</span>
+                </Link>
+              </div>
             </div>
-            <button className="bg-[#3d8b78] text-white px-4 py-2 rounded-md hover:bg-[#347a68]">
-              <Link href={`/medicaments/${med.code}`}>
-                Plus d’informations →
-              </Link>
+          ))}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center items-center gap-4">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded bg-[#388075] text-white disabled:opacity-50"
+            >
+              Previous
+            </button>
+
+            <span className="text-[#388075]">
+              {currentPage} / {totalPages}
+            </span>
+
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded bg-[#388075] text-white disabled:opacity-50"
+            >
+              Next
             </button>
           </div>
-        ))}
-
-        {/* Pagination Controls */}
-        <div className="mt-6 flex justify-center">
-          <button
-            className="px-4 py-2 bg-[#3d8b78] text-white rounded-md hover:bg-[#347a68]"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span className="mx-4 text-lg">
-            {currentPage} / {totalPages}
-          </span>
-          <button
-            className="px-4 py-2 bg-[#3d8b78] text-white rounded-md hover:bg-[#347a68]"
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
+        )}
       </div>
 
       {/* Sidebar */}
