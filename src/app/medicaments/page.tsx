@@ -16,9 +16,11 @@ export default function MedicamentsPage() {
   const [searchQuery, setSearchQuery] = useState(""); // Search query state
   const pageSize = 10;
 
+  // Function to clean the medicament name and keep everything before the comma
   const cleanMedicamentName = (name: string) => {
-    const match = name.match(/^[^,()]+/); // Match the name before any comma or parenthesis
-    return match ? match[0].trim() : name; // Return cleaned name
+    // Match everything before the first comma (including parentheses if any)
+    const match = name.match(/^[^,]*/); // This will match everything before the first comma
+    return match ? match[0].trim() : name; // Return the matched part before the comma
   };
 
   // Function to clean the composition field and remove everything after the dots
@@ -26,14 +28,26 @@ export default function MedicamentsPage() {
     const match = composition.match(/^[^\.]+/); // Match everything before the first dot
     return match ? match[0].trim() : composition; // Return the cleaned composition or the original composition if no match
   };
-
   const extractClassePharmaco = (pharmacodynamicsText: string) => {
-    // Regex: Match everything after "Classe pharmacothérapeutique:" until a comma, colon, semicolon, or parentheses
-    const match = pharmacodynamicsText.match(
-      /Classe pharmacothérapeutique\s*[:|-]?\s*([^,;:\)\n]+)/
+    // Case 1: Look for "Classe pharmacothérapeutique : ..." and capture after the colon
+    const explicitClassMatch = pharmacodynamicsText.match(
+      /Classe\spharmacothérapeutique\s*[:|-\s]*([^\n,;:]+)/
     );
 
-    return match ? match[1].trim() : "Non disponible"; // Return the cleaned class or a default message
+    if (explicitClassMatch) {
+      return explicitClassMatch[1].trim(); // Return the matched class name
+    }
+
+    // Case 2: If "Code ATC" is present, capture everything before it as the class
+    const classBeforeATCMatch = pharmacodynamicsText.match(
+      /^([^,;:\n]+)(?=\s*Code ATC)/
+    );
+
+    if (classBeforeATCMatch) {
+      return classBeforeATCMatch[1].trim(); // Return the matched class name before "Code ATC"
+    }
+
+    return "Non disponible"; // Default return if no match is found
   };
 
   const extractCodeAtc = (pharmacodynamicsText: string) => {
@@ -46,12 +60,22 @@ export default function MedicamentsPage() {
 
   // Fetch medicaments with pagination
   const fetchMedicaments = async (page: number, query: string) => {
-    const { data, count, error } = await supabase
+    let queryBuilder = supabase
       .from("medicaments")
-      .select("*", { count: "exact" })
-      .ilike("denomination_du_medicament", `%${query}%`) // Search by medicament name
-      .or(`composition_qualitative_et_quantitative.ilike.%${query}%`) // Search by DCI (composition)
-      .range((page - 1) * pageSize, page * pageSize - 1);
+      .select("*", { count: "exact" });
+
+    // Only apply filters if there's a search query
+    if (query && query.trim() !== "") {
+      queryBuilder = queryBuilder.or(
+        `denomination_du_medicament.ilike.%${query}%,` +
+          `composition_qualitative_et_quantitative.ilike.%${query}%`
+      );
+    }
+
+    const { data, count, error } = await queryBuilder.range(
+      (page - 1) * pageSize,
+      page * pageSize - 1
+    );
 
     if (error) {
       console.error("Error fetching data: ", error);
