@@ -10,24 +10,103 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { ArrowRight, AlertCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function PatientProfileForm() {
-  const [pathologies, setPathologies] = useState({
-    renal: false,
-    hepatic: false,
-    other: false,
+  const router = useRouter();
+
+  const [patientProfile, setPatientProfile] = useState({
+    pathologies: {
+      renal: false,
+      hepatic: false,
+      other: false,
+    },
+    gender: "",
+    ageGroup: "",
+    pregnancyStatus: "",
   });
+
+  const [validationError, setValidationError] = useState(false);
 
   const handlePathologyChange = (
     value: boolean,
     type: "renal" | "hepatic" | "other"
   ) => {
-    setPathologies({
-      ...pathologies,
-      [type]: value,
+    setPatientProfile({
+      ...patientProfile,
+      pathologies: {
+        ...patientProfile.pathologies,
+        [type]: value,
+      },
     });
+    // Clear validation error when user selects something
+    setValidationError(false);
+  };
+
+  const handleSelectChange = (value: string, field: string) => {
+    setPatientProfile({
+      ...patientProfile,
+      [field]: value,
+    });
+    // Clear validation error when user selects something
+    setValidationError(false);
+  };
+
+  // Function to check if at least one option is selected
+  const isProfileValid = () => {
+    return (
+      patientProfile.pathologies.renal ||
+      patientProfile.pathologies.hepatic ||
+      patientProfile.pathologies.other ||
+      patientProfile.gender !== "" ||
+      patientProfile.ageGroup !== "" ||
+      patientProfile.pregnancyStatus !== ""
+    );
+  };
+
+  const handleAddProfile = () => {
+    // Check if at least one option is selected
+    if (!isProfileValid()) {
+      setValidationError(true);
+      return;
+    }
+
+    // Encode the patient profile data as URL search params
+    const queryParams = new URLSearchParams();
+
+    // Add pathologies
+    queryParams.append("renal", patientProfile.pathologies.renal.toString());
+    queryParams.append(
+      "hepatic",
+      patientProfile.pathologies.hepatic.toString()
+    );
+    queryParams.append("other", patientProfile.pathologies.other.toString());
+
+    // Add other fields (only if they have values)
+    if (patientProfile.gender) {
+      queryParams.append("gender", patientProfile.gender);
+    }
+
+    if (patientProfile.ageGroup) {
+      queryParams.append("ageGroup", patientProfile.ageGroup);
+    }
+
+    if (patientProfile.pregnancyStatus) {
+      queryParams.append("pregnancyStatus", patientProfile.pregnancyStatus);
+    }
+
+    // Add a flag to show the sidebar
+    queryParams.append("showSidebar", "true");
+
+    // Navigate to the results page with query parameters
+    router.push(`/resultat?${queryParams.toString()}`);
+  };
+
+  const handleIgnore = () => {
+    // Navigate to the results page without any profile data
+    router.push("/resultat");
   };
 
   return (
@@ -41,6 +120,15 @@ export default function PatientProfileForm() {
         </p>
       </div>
 
+      {validationError && (
+        <Alert className="mb-6 border-red-500 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-500" />
+          <AlertDescription className="text-red-500">
+            Veuillez sélectionner au moins une option avant de continuer.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid md:grid-cols-2 gap-8">
         <div className="space-y-6">
           <div>
@@ -51,7 +139,7 @@ export default function PatientProfileForm() {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="insuffisance-renal"
-                  checked={pathologies.renal}
+                  checked={patientProfile.pathologies.renal}
                   onCheckedChange={(checked) =>
                     handlePathologyChange(checked as boolean, "renal")
                   }
@@ -66,7 +154,7 @@ export default function PatientProfileForm() {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="insuffisance-hepatique"
-                  checked={pathologies.hepatic}
+                  checked={patientProfile.pathologies.hepatic}
                   onCheckedChange={(checked) =>
                     handlePathologyChange(checked as boolean, "hepatic")
                   }
@@ -81,7 +169,7 @@ export default function PatientProfileForm() {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="autre-pathologie"
-                  checked={pathologies.other}
+                  checked={patientProfile.pathologies.other}
                   onCheckedChange={(checked) =>
                     handlePathologyChange(checked as boolean, "other")
                   }
@@ -98,7 +186,9 @@ export default function PatientProfileForm() {
 
           <div>
             <h2 className="text-lg font-medium text-emerald-700 mb-4">Sexe</h2>
-            <Select>
+            <Select
+              onValueChange={(value) => handleSelectChange(value, "gender")}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Sexe" />
               </SelectTrigger>
@@ -115,7 +205,9 @@ export default function PatientProfileForm() {
             <h2 className="text-lg font-medium text-emerald-700 mb-4">
               Tranche d&apos;âge
             </h2>
-            <Select>
+            <Select
+              onValueChange={(value) => handleSelectChange(value, "ageGroup")}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Tranche d'âge" />
               </SelectTrigger>
@@ -133,7 +225,11 @@ export default function PatientProfileForm() {
             <h2 className="text-lg font-medium text-emerald-700 mb-4">
               Grossesse-Allaitement
             </h2>
-            <Select>
+            <Select
+              onValueChange={(value) =>
+                handleSelectChange(value, "pregnancyStatus")
+              }
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Enceinte" />
               </SelectTrigger>
@@ -151,14 +247,16 @@ export default function PatientProfileForm() {
         <Button
           variant="outline"
           className="text-emerald-700 border-emerald-700"
+          onClick={handleIgnore}
         >
           Ignorer
         </Button>
-        <Link href="/saisir-med">
-          <Button className="bg-emerald-700 hover:bg-emerald-800">
-            Ajouter profil de patient <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </Link>
+        <Button
+          className="bg-emerald-700 hover:bg-emerald-800"
+          onClick={handleAddProfile}
+        >
+          Ajouter profil de patient <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
