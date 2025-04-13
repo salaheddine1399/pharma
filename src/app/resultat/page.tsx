@@ -180,6 +180,7 @@ export default function AnalysisResults() {
                         <SelectItem value="non">Non</SelectItem>
                         <SelectItem value="enceinte">Enceinte</SelectItem>
                         <SelectItem value="allaitement">Allaitement</SelectItem>
+                        <SelectItem value="fertilite">Fertilité</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
