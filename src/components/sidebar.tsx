@@ -52,7 +52,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <span className="font-medium">Trouver un médicament</span>
           </Link>
           <Link
-            href="#"
+            href="/analyse"
             className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-100"
           >
             <Search className="h-5 w-5 text-gray-600" />
