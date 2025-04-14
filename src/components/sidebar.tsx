@@ -59,7 +59,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <span>Analyse des risques</span>
           </Link>
           <Link
-            href="#"
+            href="/under-construction"
             className="flex items-center gap-3 p-3 rounded-md hover:bg-gray-100"
           >
             <FileText className="h-5 w-5 text-gray-600" />

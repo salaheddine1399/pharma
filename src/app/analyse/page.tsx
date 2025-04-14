@@ -54,7 +54,7 @@ export default function Analyse() {
             icon={Scan} // Updated to use Scan icon instead of Maximize
             title="Scanner une ordonnance"
             description="Utilisez la fonction de scan pour vérifier rapidement les risques associés à votre ordonnance."
-            href="/scanner"
+            href="/under-construction"
           />
         </div>
       </section>

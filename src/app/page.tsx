@@ -66,9 +66,11 @@ export default function Home() {
                 de pointe, nous vous offrons une analyse complète et précise de
                 toutes vos prescriptions médicales.
               </p>
-              <Button className="bg-teal-700 hover:bg-teal-800 text-white">
-                Essayer Maintenant
-              </Button>
+              <Link href="/analyse">
+                <Button className="bg-teal-700 hover:bg-teal-800 text-white">
+                  Essayer Maintenant
+                </Button>
+              </Link>
             </div>
 
             <Image
@@ -200,9 +202,11 @@ export default function Home() {
                   former les étudiants sur les médicaments et leurs interactions
                   complexes.
                 </p>
-                <Button className="bg-teal-700 hover:bg-teal-800 text-white">
-                  Essayer Maintenant
-                </Button>
+                <Link href="/under-construction">
+                  <Button className="bg-teal-700 hover:bg-teal-800 text-white">
+                    Essayer Maintenant
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
