@@ -101,12 +101,12 @@ export default function PatientProfileForm() {
     queryParams.append("showSidebar", "true");
 
     // Navigate to the results page with query parameters
-    router.push(`/resultat?${queryParams.toString()}`);
+    router.push(`/saisir-med?${queryParams.toString()}`);
   };
 
   const handleIgnore = () => {
     // Navigate to the results page without any profile data
-    router.push("/resultat");
+    router.push("/saisir-med");
   };
 
   return (

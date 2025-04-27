@@ -56,7 +56,7 @@ export default function Home() {
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-white">
-          <div className="container mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-center">
+          <div className="container mx-auto px-4  flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 z-10">
               <h1 className="text-4xl md:text-5xl font-bold text-gray-600 mb-4">
                 Bienvenue sur Pharmaintex
