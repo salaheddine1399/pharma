@@ -72,7 +72,6 @@ export default function AnalysisResults() {
     const fetchMedicationData = async () => {
       setIsLoading(true);
       try {
-        // Get the medication codes and ATC codes from URL parameters
         const medCode0 = searchParams.get("medCode0");
         const atcCode0 = searchParams.get("atcCode0");
         const medCode1 = searchParams.get("medCode1");
@@ -89,17 +88,12 @@ export default function AnalysisResults() {
           .select("*")
           .in("Code_CIS", [medCode0, medCode1]);
 
-        if (medsError) {
-          throw medsError;
-        }
-
-        if (!medsData || medsData.length === 0) {
+        if (medsError || !medsData || medsData.length === 0) {
           setError("No medication data found for the provided codes");
           setIsLoading(false);
           return;
         }
 
-        // Create medication objects with data from URL parameters and fetched data
         const uniqueMeds = [
           {
             cis: medCode0,
@@ -125,9 +119,9 @@ export default function AnalysisResults() {
 
         setMedications(uniqueMeds);
 
-        // Check for interactions between the two medications based on ATC codes
         const foundInteractions: Interaction[] = [];
 
+        // Look for interactions
         const med1Interactions = medsData.filter(
           (row) => row["Code_CIS"] === medCode1 && row["Code_ATC"] === atcCode0
         );
