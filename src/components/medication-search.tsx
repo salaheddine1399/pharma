@@ -6,14 +6,26 @@ import { Search, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import supabase from "@/lib/supabase"; // Import Supabase client
 
+interface Medication {
+  code: string;
+  denomination_du_medicament: string | null;
+  composition_qualitative_et_quantitative: string | null;
+  proprietes_pharmacodynamiques: string | null;
+}
+
 export default function MedicationSearch() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchContainerRef = useRef<HTMLDivElement | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedMedications, setSelectedMedications] = useState<any[]>([]); // Store selected medications
-  const [medications, setMedications] = useState<any[]>([]); // Store all fetched medications
-  const [filteredMedications, setFilteredMedications] = useState<any[]>([]); // Store filtered medications based on search term
+  const [selectedMedications, setSelectedMedications] = useState<Medication[]>(
+    []
+  );
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [filteredMedications, setFilteredMedications] = useState<Medication[]>(
+    []
+  );
+
   const pageSize = 10;
 
   // Function to clean the medicament name and keep everything before the comma
@@ -68,7 +80,7 @@ export default function MedicationSearch() {
 
       if (error) throw error;
 
-      setMedications(data || []);
+      setMedications(data as Medication[]);
     } catch (error) {
       console.error("Error fetching medications:", error);
     }
@@ -80,10 +92,11 @@ export default function MedicationSearch() {
 
   // Handle clicks outside the dropdown
   useEffect(() => {
-    function handleClickOutside(event: { target: any }) {
+    function handleClickOutside(event: MouseEvent) {
+      // Change `any` to `MouseEvent`
       if (
         searchContainerRef.current &&
-        !searchContainerRef.current.contains(event.target)
+        !searchContainerRef.current.contains(event.target as Node) // Cast event.target to `Node` to avoid errors
       ) {
         setFilteredMedications([]);
       }
@@ -112,7 +125,7 @@ export default function MedicationSearch() {
   };
 
   // Add medication to the selection
-  const handleAddMedication = (medication: any) => {
+  const handleAddMedication = (medication: Medication) => {
     if (selectedMedications.length < 2) {
       setSelectedMedications((prev) => [...prev, medication]);
       setSearchTerm(""); // Clear search term after selection
@@ -207,7 +220,7 @@ export default function MedicationSearch() {
                     </div>
                     <span>
                       {cleanMedicamentName(
-                        medication.denomination_du_medicament
+                        medication.denomination_du_medicament || ""
                       )}
                     </span>
                   </div>
@@ -238,14 +251,16 @@ export default function MedicationSearch() {
             </div>
             <div className="flex-grow">
               <h2 className="text-xl font-medium text-teal-600 mb-3">
-                {cleanMedicamentName(medication.denomination_du_medicament)}
+                {cleanMedicamentName(
+                  medication.denomination_du_medicament || ""
+                )}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4 text-sm">
                 <div>
                   <span className="text-gray-500">DCI: </span>
                   <span className="text-gray-700">
                     {cleanComposition(
-                      medication.composition_qualitative_et_quantitative
+                      medication.composition_qualitative_et_quantitative || ""
                     )}
                   </span>
                 </div>

@@ -62,9 +62,9 @@ export default function Home() {
                 Bienvenue sur Pharmaintex
               </h1>
               <p className="text-neutral-500 mb-8 max-w-lg">
-                Votre outil d'analyse des médicaments. Grâce à notre technologie
-                de pointe, nous vous offrons une analyse complète et précise de
-                toutes vos prescriptions médicales.
+                Votre outil d&apos;analyse des médicaments. Grâce à notre
+                technologie de pointe, nous vous offrons une analyse complète et
+                précise de toutes vos prescriptions médicales.
               </p>
               <Link href="/analyse">
                 <Button className="bg-teal-700 hover:bg-teal-800 text-white">
@@ -170,7 +170,7 @@ export default function Home() {
                   Administration des médicaments
                 </h4>
                 <p className="text-neutral-500">
-                  La meilleure façon d'administrer vos médicaments pour
+                  La meilleure façon d&apos;administrer vos médicaments pour
                   optimiser leur efficacité.
                 </p>
               </div>
@@ -216,9 +216,9 @@ export default function Home() {
         <section className="py-12 bg-teal-700 text-white">
           <div className="container mx-auto px-4 text-center">
             <p className="mb-6 max-w-2xl mx-auto">
-              Inscrivez-vous sur notre site pour bénéficier d'une analyse
-              d'ordonnance sécurisée et d'une optimisation de votre revue de
-              thérapie pour vos patients.
+              Inscrivez-vous sur notre site pour bénéficier d&apos;une analyse
+              d&apos;ordonnance sécurisée et d&apos;une optimisation de votre
+              revue de thérapie pour vos patients.
             </p>
             <Button
               variant="secondary"
@@ -241,7 +241,7 @@ export default function Home() {
               <Accordion type="single" collapsible className="space-y-4">
                 <AccordionItem value="item-1" className="border rounded-md p-2">
                   <AccordionTrigger className="text-gray-600 text-left font-medium">
-                    C'est quoi Pharmaintex?
+                    C&apos;est quoi Pharmaintex?
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600 pt-2">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
@@ -275,7 +275,8 @@ export default function Home() {
 
                 <AccordionItem value="item-4" className="border rounded-md p-2">
                   <AccordionTrigger className=" text-gray-600 text-left font-medium">
-                    Est-ce que l'accès à Pharmaintex nécessite un abonnement?
+                    Est-ce que l&apos;accès à Pharmaintex nécessite un
+                    abonnement?
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600 pt-2">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed

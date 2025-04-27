@@ -10,7 +10,16 @@ import supabase from "@/lib/supabase"; // Import Supabase client
 
 export default function MedicamentsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [medicaments, setMedicaments] = useState<any[]>([]);
+  interface Medicament {
+    code: string;
+    denomination_du_medicament: string;
+    composition_qualitative_et_quantitative: string;
+    proprietes_pharmacodynamiques?: string;
+    forme_pharmaceutique: string;
+    image_url?: string;
+  }
+
+  const [medicaments, setMedicaments] = useState<Medicament[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState(""); // Search query state
@@ -158,10 +167,12 @@ export default function MedicamentsPage() {
               className="bg-white rounded-lg shadow-sm overflow-hidden flex"
             >
               <div className="w-50 h-50 flex-shrink-0 bg-gray-100 flex items-center justify-center p-4">
-                <img
+                <Image
                   src={med.image_url || "/default-img.jpg"}
                   alt={cleanMedicamentName(med.denomination_du_medicament)}
                   className="max-h-full max-w-full object-contain"
+                  width={500} // Specify appropriate width
+                  height={500} // Specify appropriate height
                 />
               </div>
 
@@ -214,7 +225,7 @@ export default function MedicamentsPage() {
                   href={`/medicaments/${med.code}`}
                   className="bg-[#388075] hover:bg-[#2D6A62] text-white px-4 py-2 rounded flex items-center gap-2 transition-colors whitespace-nowrap"
                 >
-                  <span>Plus d'informations</span>
+                  <span>Plus d&apos;informations</span>
                   <span>→</span>
                 </Link>
               </div>

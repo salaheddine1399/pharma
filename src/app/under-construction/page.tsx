@@ -1,15 +1,9 @@
 import Link from "next/link";
-import {
-  FlaskRoundIcon as Flask,
-  Mail,
-  ArrowLeft,
-  Clock,
-  Pill,
-} from "lucide-react";
+import { FlaskRoundIcon as Flask, ArrowLeft, Pill } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+
 import { Progress } from "@/components/ui/progress";
 
 export default function UnderConstruction() {
@@ -58,7 +52,7 @@ export default function UnderConstruction() {
               >
                 <Link href="/">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Retour à l'accueil
+                  Retour à l&apos;accueil
                 </Link>
               </Button>
             </div>

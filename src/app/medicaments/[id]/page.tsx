@@ -1,13 +1,26 @@
 "use client"; // Ensure this component is treated as client-side
 
 import { useState, useEffect } from "react";
-import { ArrowLeft, ChevronDown, AlertCircle, Menu } from "lucide-react";
+import { ArrowLeft, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+
 import Sidebar from "@/components/sidebar";
-import UserAvatar from "@/components/user-avatar";
+
 import supabase from "@/lib/supabase";
 import { useParams } from "next/navigation";
+
+interface Interaction {
+  // Define the structure of each interaction item here
+  type: string;
+  description: string;
+}
+
+interface Equivalence {
+  // Define the structure of each equivalence item here
+  code: string;
+  name: string;
+}
 
 interface Medication {
   code: string;
@@ -19,8 +32,8 @@ interface Medication {
   proprietes_pharmacodynamiques: string | null;
   titulaire_de_l_authorisation_de_mise_sur_le_marche: string | null;
   image_url?: string;
-  interactions?: any[];
-  equivalences?: any[];
+  interactions?: Interaction[]; // Update with specific type
+  equivalences?: Equivalence[]; // Update with specific type
   classe_therapeutique?: string;
 }
 
@@ -31,7 +44,7 @@ export default function MedicamentDetailPage() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [medication, setMedication] = useState<Medication | null>(null);
-  const [expandedSection, setExpandedSection] = useState<string>("");
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -181,8 +194,8 @@ export default function MedicamentDetailPage() {
             {error || "Médicament non trouvé"}
           </h2>
           <p className="text-gray-600 mb-6">
-            Nous n'avons pas pu trouver les informations pour ce médicament. Il
-            est possible que le code soit incorrect.
+            Nous n&apos;avons pas pu trouver les informations pour ce
+            médicament. Il est possible que le code soit incorrect.
           </p>
           <Link
             href="/medicaments"
@@ -213,10 +226,12 @@ export default function MedicamentDetailPage() {
       {/* Medication Info */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <div className="bg-gray-100 p-4 rounded-lg flex items-center justify-center">
-          <img
+          <Image
             src={"/default-img.jpg"}
             alt={cleanMedicamentName(medication.denomination_du_medicament)}
             className="max-w-full h-auto max-h-48 object-contain"
+            width={500} // Provide width
+            height={500} // Provide height
           />
         </div>
         <div className="md:col-span-2">

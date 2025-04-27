@@ -25,15 +25,15 @@ export default function AnalysisResults() {
   const [medications, setMedications] = useState<
     { cis: string; atc: string; name: string }[]
   >([]);
-  const [interactions, setInteractions] = useState<
-    {
-      medication1: string;
-      medication2: string;
-      type: string;
-      effects: string;
-      remarks: string;
-    }[]
-  >([]);
+  interface Interaction {
+    medication1: string;
+    medication2: string;
+    type: string;
+    effects: string;
+    remarks: string;
+  }
+
+  const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [patientProfile, setPatientProfile] = useState({
@@ -84,7 +84,6 @@ export default function AnalysisResults() {
           return;
         }
 
-        // Fetch data for the two medications from Supabase
         const { data: medsData, error: medsError } = await supabase
           .from("medication_interactions")
           .select("*")
@@ -127,17 +126,8 @@ export default function AnalysisResults() {
         setMedications(uniqueMeds);
 
         // Check for interactions between the two medications based on ATC codes
-        const foundInteractions:
-          | ((prevState: never[]) => never[])
-          | {
-              medication1: any;
-              medication2: any;
-              type: any;
-              effects: any;
-              remarks: any;
-            }[] = [];
+        const foundInteractions: Interaction[] = [];
 
-        // Check if ATC code of med0 appears in interactions of med1
         const med1Interactions = medsData.filter(
           (row) => row["Code_CIS"] === medCode1 && row["Code_ATC"] === atcCode0
         );
@@ -152,7 +142,6 @@ export default function AnalysisResults() {
           });
         });
 
-        // Check if ATC code of med1 appears in interactions of med0
         const med0Interactions = medsData.filter(
           (row) => row["Code_CIS"] === medCode0 && row["Code_ATC"] === atcCode1
         );
@@ -194,7 +183,7 @@ export default function AnalysisResults() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
               <h1 className="text-2xl font-medium text-teal-700">
-                Résultats d'analyse
+                Résultats d&apos;analyse
               </h1>
               <p className="text-gray-500 text-sm mt-1">
                 Vous trouverez ci-dessous la liste des risques potentiels
@@ -271,7 +260,9 @@ export default function AnalysisResults() {
                   </div>
 
                   <div className="space-y-3">
-                    <h3 className="text-lg text-gray-500">Tranche d'âge</h3>
+                    <h3 className="text-lg text-gray-500">
+                      Tranche d&apos;âge
+                    </h3>
                     <Select disabled value={patientProfile.ageGroup}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Tranche d'âge" />
@@ -437,7 +428,7 @@ export default function AnalysisResults() {
                       (int) => int.type === "Associations à prendre en compte"
                     ) && (
                       <Badge className="px-4 py-2 text-base bg-yellow-500 hover:bg-yellow-600 rounded-full mb-2">
-                        <span>Précautions d'emploi</span>
+                        <span>Précautions d&apos;emploi</span>
                         <div className="ml-2 bg-white text-yellow-500 rounded-full h-6 w-6 flex items-center justify-center font-bold text-sm">
                           {
                             interactions.filter(
@@ -508,7 +499,7 @@ export default function AnalysisResults() {
                     <Card>
                       <CardContent className="p-6 text-center">
                         <p className="text-gray-500">
-                          Aucune interaction n'a été détectée entre les
+                          Aucune interaction n&apos;a été détectée entre les
                           médicaments sélectionnés.
                         </p>
                       </CardContent>

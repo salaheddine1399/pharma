@@ -1,15 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Search,
-  Plus,
-  Maximize,
-  FileText,
-  Home,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { Search, Plus, FileText, LogOut } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
