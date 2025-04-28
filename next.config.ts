@@ -6,9 +6,11 @@ const nextConfig: NextConfig = {
 
 module.exports = {
   images: {
-    domains: ['www.pharmnet-dz.com'], // Add the domain here
+    domains: ["www.pharmnet-dz.com"], // Add the domain here
+  },
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
   },
 };
-
 
 export default nextConfig;
