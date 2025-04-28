@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ArrowRight, Loader2 } from "lucide-react";
-
 import Link from "next/link";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,7 +18,29 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import supabase from "@/lib/supabase";
 
-export default function AnalysisResults() {
+// This is the main component that will be exported
+export default function AnalysisResultsPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <AnalysisResults />
+    </Suspense>
+  );
+}
+
+// Loading fallback component
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center">
+        <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+        <span className="ml-2 text-gray-500">Chargement des résultats...</span>
+      </div>
+    </div>
+  );
+}
+
+// Component that uses useSearchParams, now safely wrapped in Suspense
+function AnalysisResults() {
   const searchParams = useSearchParams();
   const [showSidebar, setShowSidebar] = useState(false);
   const [medications, setMedications] = useState<

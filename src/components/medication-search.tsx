@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Image from "next/image";
-import { Search, X } from "lucide-react";
+import { Search, X, Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import supabase from "@/lib/supabase"; // Import Supabase client
 
@@ -13,7 +13,27 @@ interface Medication {
   proprietes_pharmacodynamiques: string | null;
 }
 
-export default function MedicationSearch() {
+// Loading fallback component
+function LoadingFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-[200px]">
+      <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+      <span className="ml-2 text-gray-500">Chargement...</span>
+    </div>
+  );
+}
+
+// Main component to be exported
+export default function MedicationSearchWrapper() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <MedicationSearch />
+    </Suspense>
+  );
+}
+
+// The component that uses useSearchParams
+function MedicationSearch() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchContainerRef = useRef<HTMLDivElement | null>(null);
@@ -93,10 +113,9 @@ export default function MedicationSearch() {
   // Handle clicks outside the dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      // Change `any` to `MouseEvent`
       if (
         searchContainerRef.current &&
-        !searchContainerRef.current.contains(event.target as Node) // Cast event.target to `Node` to avoid errors
+        !searchContainerRef.current.contains(event.target as Node)
       ) {
         setFilteredMedications([]);
       }
