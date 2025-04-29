@@ -1,5 +1,7 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -9,9 +11,11 @@ import {
 } from "@/components/ui/accordion";
 
 export default function Home() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="container mx-auto py-4 px-4 flex items-center justify-between">
+      <header className="container mx-auto py-4 px-4 flex items-center justify-between relative">
         <div className="flex items-center">
           <Image
             src="/logo.svg"
@@ -48,17 +52,51 @@ export default function Home() {
         <Button
           variant="outline"
           className="md:hidden border-teal-700 text-teal-700"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           Menu
         </Button>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="absolute top-full left-0 right-0 bg-white shadow-lg z-50 px-4 py-4 flex flex-col space-y-4 md:hidden">
+            <a
+              href="#fonctionnalites"
+              className="text-gray-600 hover:text-teal-700 py-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Fonctionnalités
+            </a>
+            <a
+              href="#faq"
+              className="text-gray-600 hover:text-teal-700 py-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              FAQ
+            </a>
+            <a
+              href="#contactez-nous"
+              className="text-gray-600 hover:text-teal-700 py-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contactez-nous
+            </a>
+            <Button
+              variant="outline"
+              className="border-teal-700 text-teal-700 hover:bg-teal-50 w-full"
+            >
+              Connectez-vous
+            </Button>
+          </div>
+        )}
       </header>
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-white">
-          <div className="container mx-auto px-4  flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 z-10">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-600 mb-4">
+        <section className="relative overflow-hidden bg-white py-12">
+          <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <div className="md:w-1/2 z-10 mb-8 md:mb-0">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-600 mb-4">
                 Bienvenue sur Pharmaintex
               </h1>
               <p className="text-neutral-500 mb-8 max-w-lg">
@@ -67,34 +105,36 @@ export default function Home() {
                 précise de toutes vos prescriptions médicales.
               </p>
               <Link href="/analyse">
-                <Button className="bg-teal-700 hover:bg-teal-800 text-white">
+                <Button className="bg-teal-700 hover:bg-teal-800 text-white w-full sm:w-auto">
                   Essayer Maintenant
                 </Button>
               </Link>
             </div>
 
-            <Image
-              src="/hero-illustration.svg"
-              alt="Pharmaintex illustration"
-              width={865}
-              height={937}
-              className="relative z-10"
-            />
+            <div className="w-full md:w-1/2 flex justify-center">
+              <Image
+                src="/hero-illustration.svg"
+                alt="Pharmaintex illustration"
+                width={500}
+                height={500}
+                className="relative z-10 max-w-full h-auto"
+              />
+            </div>
           </div>
         </section>
 
         {/* Features Section */}
-        <section id="fonctionnalites" className="py-16 bg-white">
+        <section id="fonctionnalites" className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-600 mb-16 relative">
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-600 mb-10 md:mb-16 relative">
               Nos fonctionnalités
               <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 w-16 h-0.25 bg-gray-600"></span>
             </h2>
 
             {/* Main Feature */}
-            <div className="flex flex-col md:flex-row items-center mb-20">
+            <div className="flex flex-col md:flex-row items-center mb-12 md:mb-20">
               <div className="md:w-1/2 mb-8 md:mb-0">
-                <h3 className="text-2xl md:text-3xl font-bold text-gray-600 mb-4">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-600 mb-4">
                   Analyse des Interactions Médicamenteuses
                 </h3>
                 <p className="text-neutral-500 mb-6 max-w-lg">
@@ -103,27 +143,25 @@ export default function Home() {
                   votre sécurité de façon optimale.
                 </p>
                 <Link href="/analyse">
-                  <Button className="bg-teal-700 hover:bg-teal-800 text-white">
+                  <Button className="bg-teal-700 hover:bg-teal-800 text-white w-full sm:w-auto">
                     Essayer Maintenant
                   </Button>
                 </Link>
               </div>
-              <div className="md:w-1/2 relative">
-                <div className="relative z-10">
-                  <Image
-                    src="/feature-illustration.svg"
-                    alt="Analyse des Interactions"
-                    width={512}
-                    height={518}
-                    className="relative z-10"
-                  />
-                </div>
+              <div className="md:w-1/2 flex justify-center">
+                <Image
+                  src="/feature-illustration.svg"
+                  alt="Analyse des Interactions"
+                  width={400}
+                  height={400}
+                  className="relative z-10 max-w-full h-auto"
+                />
               </div>
             </div>
 
             {/* Feature Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-emerald-50 p-6 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+              <div className="bg-emerald-50 p-4 md:p-6 rounded-lg">
                 <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mb-4">
                   <span className="text-red-500 text-xl">🔍</span>
                 </div>
@@ -136,7 +174,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="bg-emerald-50 p-6 rounded-lg">
+              <div className="bg-emerald-50 p-4 md:p-6 rounded-lg">
                 <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mb-4">
                   <span className="text-yellow-500 text-xl">⚡</span>
                 </div>
@@ -149,7 +187,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="bg-emerald-50 p-6 rounded-lg">
+              <div className="bg-emerald-50 p-4 md:p-6 rounded-lg">
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mb-4">
                   <span className="text-blue-500 text-xl">🔄</span>
                 </div>
@@ -162,7 +200,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="bg-emerald-50 p-6 rounded-lg">
+              <div className="bg-emerald-50 p-4 md:p-6 rounded-lg">
                 <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mb-4">
                   <span className="text-green-500 text-xl">📋</span>
                 </div>
@@ -179,22 +217,20 @@ export default function Home() {
         </section>
 
         {/* Quiz Section */}
-        <section className="py-16 bg-white">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center">
-              <div className="md:w-1/2 mb-8 md:mb-0">
-                <div className="relative">
-                  <Image
-                    src="/quiz-illustration.svg"
-                    alt="Quiz illustration"
-                    width={512}
-                    height={518}
-                    className="relative z-10"
-                  />
-                </div>
+            <div className="flex flex-col-reverse md:flex-row items-center">
+              <div className="md:w-1/2 flex justify-center mb-8 md:mb-0">
+                <Image
+                  src="/quiz-illustration.svg"
+                  alt="Quiz illustration"
+                  width={400}
+                  height={400}
+                  className="relative z-10 max-w-full h-auto"
+                />
               </div>
-              <div className="md:w-1/2">
-                <h3 className="text-2xl md:text-3xl font-bold text-teal-700 mb-4">
+              <div className="md:w-1/2 mb-6 md:mb-0">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-teal-700 mb-4">
                   Quiz sur Médicaments et Interactions
                 </h3>
                 <p className="text-neutral-500 mb-6 max-w-lg">
@@ -203,7 +239,7 @@ export default function Home() {
                   complexes.
                 </p>
                 <Link href="/under-construction">
-                  <Button className="bg-teal-700 hover:bg-teal-800 text-white">
+                  <Button className="bg-teal-700 hover:bg-teal-800 text-white w-full sm:w-auto">
                     Essayer Maintenant
                   </Button>
                 </Link>
@@ -213,16 +249,16 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-12 bg-teal-700 text-white">
+        <section className="py-8 md:py-12 bg-teal-700 text-white">
           <div className="container mx-auto px-4 text-center">
-            <p className="mb-6 max-w-2xl mx-auto">
+            <p className="mb-6 max-w-2xl mx-auto px-2">
               Inscrivez-vous sur notre site pour bénéficier d&apos;une analyse
               d&apos;ordonnance sécurisée et d&apos;une optimisation de votre
               revue de thérapie pour vos patients.
             </p>
             <Button
               variant="secondary"
-              className="text-teal-700 border-white bg-slate-50"
+              className="text-teal-700 border-white bg-slate-50 w-full sm:w-auto"
             >
               Inscrivez-vous
             </Button>
@@ -230,9 +266,9 @@ export default function Home() {
         </section>
 
         {/* FAQ Section */}
-        <section id="faq" className="py-16 bg-white">
+        <section id="faq" className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-600 text-center mb-16 relative">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-600 text-center mb-10 md:mb-16 relative">
               FAQ
               <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 w-16 h-0.25 bg-gray-600"></span>
             </h2>
@@ -251,7 +287,7 @@ export default function Home() {
                 </AccordionItem>
 
                 <AccordionItem value="item-2" className="border rounded-md p-2">
-                  <AccordionTrigger className=" text-gray-600 text-left font-medium">
+                  <AccordionTrigger className="text-gray-600 text-left font-medium">
                     Pour qui est destiné Pharmaintex?
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600 pt-2">
@@ -262,7 +298,7 @@ export default function Home() {
                 </AccordionItem>
 
                 <AccordionItem value="item-3" className="border rounded-md p-2">
-                  <AccordionTrigger className=" text-gray-600 text-left font-medium">
+                  <AccordionTrigger className="text-gray-600 text-left font-medium">
                     Quelles sont les différences notables utilisées par
                     Pharmaintex pour son fonctionnement?
                   </AccordionTrigger>
@@ -274,7 +310,7 @@ export default function Home() {
                 </AccordionItem>
 
                 <AccordionItem value="item-4" className="border rounded-md p-2">
-                  <AccordionTrigger className=" text-gray-600 text-left font-medium">
+                  <AccordionTrigger className="text-gray-600 text-left font-medium">
                     Est-ce que l&apos;accès à Pharmaintex nécessite un
                     abonnement?
                   </AccordionTrigger>
@@ -290,15 +326,15 @@ export default function Home() {
         </section>
 
         {/* Contact Section */}
-        <section id="contactez-nous" className="py-16 bg-white">
+        <section id="contactez-nous" className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-16 text-gray-600 relative">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 md:mb-16 text-gray-600 relative">
               Contactez-nous
               <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 w-16 h-0.25 bg-gray-600"></span>
             </h2>
 
-            <div className="flex flex-col md:flex-row items-start max-w-5xl mx-auto">
-              <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8">
+            <div className="flex flex-col md:flex-row items-center max-w-5xl mx-auto">
+              <div className="w-full md:w-1/2 mb-8 md:mb-0 md:pr-8">
                 <h3 className="text-xl text-gray-600 font-semibold mb-4">
                   Envoyer un message
                 </h3>
@@ -337,13 +373,15 @@ export default function Home() {
                 </form>
               </div>
 
-              <Image
-                src="/contact-illustration.svg"
-                alt="Contact"
-                width={512}
-                height={518}
-                className="relative z-10"
-              />
+              <div className="w-full md:w-1/2 flex justify-center">
+                <Image
+                  src="/contact-illustration.svg"
+                  alt="Contact"
+                  width={400}
+                  height={400}
+                  className="relative z-10 max-w-full h-auto"
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -352,7 +390,7 @@ export default function Home() {
       <footer className="bg-teal-700 text-white py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-start mb-8">
-            <div className="mb-6 md:mb-0">
+            <div className="mb-6 md:mb-0 w-full md:w-auto">
               <div className="flex items-center mb-4">
                 <Image
                   src="/logo-white.svg"
@@ -414,7 +452,7 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full md:w-auto mt-6 md:mt-0">
               <div>
                 <h4 className="font-semibold mb-4">Liens</h4>
                 <ul className="space-y-2">

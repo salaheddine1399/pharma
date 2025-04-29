@@ -27,8 +27,7 @@ export default function MedicamentsPage() {
 
   // Function to clean the medicament name and keep everything before the comma
   const cleanMedicamentName = (name: string) => {
-    // Match everything before the first comma (including parentheses if any)
-    const match = name.match(/^[^,]*/); // This will match everything before the first comma
+    const match = name.match(/^[^,]*/); // Match everything before the first comma
     return match ? match[0].trim() : name; // Return the matched part before the comma
   };
 
@@ -38,7 +37,6 @@ export default function MedicamentsPage() {
     return match ? match[0].trim() : composition; // Return the cleaned composition or the original composition if no match
   };
   const extractClassePharmaco = (pharmacodynamicsText: string) => {
-    // Case 1: Look for "Classe pharmacothérapeutique : ..." and capture after the colon
     const explicitClassMatch = pharmacodynamicsText.match(
       /Classe\spharmacothérapeutique\s*[:|-\s]*([^\n,;:]+)/
     );
@@ -47,7 +45,6 @@ export default function MedicamentsPage() {
       return explicitClassMatch[1].trim(); // Return the matched class name
     }
 
-    // Case 2: If "Code ATC" is present, capture everything before it as the class
     const classBeforeATCMatch = pharmacodynamicsText.match(
       /^([^,;:\n]+)(?=\s*Code ATC)/
     );
@@ -60,7 +57,6 @@ export default function MedicamentsPage() {
   };
 
   const extractCodeAtc = (pharmacodynamicsText: string) => {
-    // Use regex to capture the Code ATC after "Code ATC :"
     const match = pharmacodynamicsText.match(
       /Code ATC\s*[:|-]?\s*([A-Za-z0-9]+)/
     );
@@ -73,7 +69,6 @@ export default function MedicamentsPage() {
       .from("medicaments")
       .select("*", { count: "exact" });
 
-    // Only apply filters if there's a search query
     if (query && query.trim() !== "") {
       queryBuilder = queryBuilder.or(
         `denomination_du_medicament.ilike.%${query}%,` +
@@ -94,12 +89,10 @@ export default function MedicamentsPage() {
     }
   };
 
-  // Run the fetch when the page is loaded or when the currentPage changes
   useEffect(() => {
     fetchMedicaments(currentPage, searchQuery);
   }, [currentPage, searchQuery]);
 
-  // Handle the search input change
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
@@ -107,7 +100,7 @@ export default function MedicamentsPage() {
   return (
     <div className="min-h-screen bg-[#EEF7F2]">
       {/* Header */}
-      <header className="bg-[#388075] text-white py-10 px-10 flex justify-between items-center">
+      <header className="bg-[#388075] text-white py-10 px-6 sm:px-10 flex justify-between items-center">
         <div className="flex items-center">
           <Image
             src="/logo-white.svg"
@@ -127,20 +120,20 @@ export default function MedicamentsPage() {
       </header>
 
       {/* Search Bar */}
-      <div className="p-6 bg-white shadow-md flex items-center justify-between rounded-lg mt-4 mx-6">
-        <div>
+      <div className="p-6 bg-white shadow-md flex flex-col sm:flex-row items-center justify-between rounded-lg mt-4 mx-6">
+        <div className="flex-1">
           <h2 className="text-xl font-bold text-[#184C42]">
             Trouvez un médicament
           </h2>
           <p className="text-gray-500 text-sm">Entrez votre recherche...</p>
-          <div className="mt-3 relative w-[500px]">
+          <div className="mt-3 relative w-full sm:w-[500px]">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Médicament/DCI"
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3d8b78]"
-              value={searchQuery} // Bind the input value to the search query state
-              onChange={handleSearchChange} // Update the search query on input change
+              value={searchQuery}
+              onChange={handleSearchChange}
             />
           </div>
         </div>
@@ -149,12 +142,12 @@ export default function MedicamentsPage() {
           alt="Illustration"
           width={100}
           height={100}
-          className="h-24 w-auto"
+          className="h-24 w-auto mt-4 sm:mt-0"
         />
       </div>
 
       {/* Medicaments Results */}
-      <div className="px-12 py-4">
+      <div className="px-6 sm:px-12 py-4">
         <h2 className="text-xl font-bold">Résultats ({medicaments.length})</h2>
         <p className="text-gray-500 text-sm mb-6">
           Voici les médicaments avec leurs informations
@@ -164,15 +157,15 @@ export default function MedicamentsPage() {
           {medicaments.map((med) => (
             <div
               key={med.code}
-              className="bg-white rounded-lg shadow-sm overflow-hidden flex"
+              className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col sm:flex-row"
             >
-              <div className="w-50 h-50 flex-shrink-0 bg-gray-100 flex items-center justify-center p-4">
+              <div className="w-full sm:w-50 h-50 flex-shrink-0 bg-gray-100 flex items-center justify-center p-4">
                 <Image
                   src={med.image_url || "/default-img.jpg"}
                   alt={cleanMedicamentName(med.denomination_du_medicament)}
                   className="max-h-full max-w-full object-contain"
-                  width={500} // Specify appropriate width
-                  height={500} // Specify appropriate height
+                  width={500}
+                  height={500}
                 />
               </div>
 
