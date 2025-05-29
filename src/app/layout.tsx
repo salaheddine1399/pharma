@@ -6,7 +6,7 @@ import "./globals.css";
 const inter = Cairo({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Pharmaintex - Analyse des Interactions Médicamenteuses",
+  title: "Pharmintex - Analyse des Interactions Médicamenteuses",
   description:
     "Votre outil d'analyse des médicaments et interactions médicamenteuses",
 };

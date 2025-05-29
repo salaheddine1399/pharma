@@ -10,9 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowRight, AlertCircle } from "lucide-react";
+import { ArrowRight, AlertCircle, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import Link from "next/link";
 
 export default function PatientProfileForm() {
   const router = useRouter();
@@ -112,6 +113,16 @@ export default function PatientProfileForm() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="border-b pb-4 mb-8">
+        {/* Breadcrumb/Home Button Option */}
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-[#388075] hover:text-[#2d6b61] transition-colors"
+          >
+            <Home className="h-4 w-4" />
+            <span className="text-sm">← Retour à l'accueil</span>
+          </Link>
+        </div>
         <h1 className="text-2xl font-medium text-emerald-700">
           Profil du patient
         </h1>

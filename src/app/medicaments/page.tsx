@@ -2,7 +2,7 @@
 
 import Sidebar from "@/components/sidebar";
 import UserAvatar from "@/components/user-avatar";
-import { Menu, Search } from "lucide-react";
+import { Menu, Search, Home } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -109,7 +109,7 @@ export default function MedicamentsPage() {
             height={32}
             className="mr-2"
           />
-          <span className="font-bold text-white text-lg">PHARMAINTEX</span>
+          <span className="font-bold text-white text-lg">PHARMINTEX</span>
         </div>
         <div className="flex items-center gap-4">
           <UserAvatar initials="TA" />
@@ -118,6 +118,17 @@ export default function MedicamentsPage() {
           </button>
         </div>
       </header>
+
+      {/* Home Button */}
+      <div className="px-6 pt-6">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-[#388075] hover:text-[#2d6b61] transition-colors"
+        >
+          <Home className="h-4 w-4" />
+          <span className="text-sm">← Retour à l'accueil</span>
+        </Link>
+      </div>
 
       {/* Search Bar */}
       <div className="p-6 bg-white shadow-md flex flex-col sm:flex-row items-center justify-between rounded-lg mt-4 mx-6">

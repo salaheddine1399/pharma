@@ -19,12 +19,12 @@ export default function Home() {
         <div className="flex items-center">
           <Image
             src="/logo.svg"
-            alt="Pharmaintex"
+            alt="Pharmintex"
             width={32}
             height={32}
             className="mr-2"
           />
-          <span className="font-bold text-teal-700 text-lg">PHARMAINTEX</span>
+          <span className="font-bold text-teal-700 text-lg">PHARMINTEX</span>
         </div>
         <nav className="hidden md:flex items-center space-x-6">
           <a
@@ -97,7 +97,7 @@ export default function Home() {
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 z-10 mb-8 md:mb-0">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-600 mb-4">
-                Bienvenue sur Pharmaintex
+                Bienvenue sur Pharmintex
               </h1>
               <p className="text-neutral-500 mb-8 max-w-lg">
                 Votre outil d&apos;analyse des médicaments. Grâce à notre
@@ -277,7 +277,7 @@ export default function Home() {
               <Accordion type="single" collapsible className="space-y-4">
                 <AccordionItem value="item-1" className="border rounded-md p-2">
                   <AccordionTrigger className="text-gray-600 text-left font-medium">
-                    C&apos;est quoi Pharmaintex?
+                    C&apos;est quoi Pharmintex?
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600 pt-2">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
@@ -288,7 +288,7 @@ export default function Home() {
 
                 <AccordionItem value="item-2" className="border rounded-md p-2">
                   <AccordionTrigger className="text-gray-600 text-left font-medium">
-                    Pour qui est destiné Pharmaintex?
+                    Pour qui est destiné Pharmintex?
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600 pt-2">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
@@ -300,7 +300,7 @@ export default function Home() {
                 <AccordionItem value="item-3" className="border rounded-md p-2">
                   <AccordionTrigger className="text-gray-600 text-left font-medium">
                     Quelles sont les différences notables utilisées par
-                    Pharmaintex pour son fonctionnement?
+                    Pharmintex pour son fonctionnement?
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600 pt-2">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
@@ -311,7 +311,7 @@ export default function Home() {
 
                 <AccordionItem value="item-4" className="border rounded-md p-2">
                   <AccordionTrigger className="text-gray-600 text-left font-medium">
-                    Est-ce que l&apos;accès à Pharmaintex nécessite un
+                    Est-ce que l&apos;accès à Pharmintex nécessite un
                     abonnement?
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600 pt-2">
@@ -399,9 +399,7 @@ export default function Home() {
                   height={32}
                   className="mr-2"
                 />
-                <span className="font-bold text-white text-lg">
-                  PHARMAINTEX
-                </span>
+                <span className="font-bold text-white text-lg">PHARMINTEX</span>
               </div>
               <div className="flex space-x-4">
                 <a href="#" className="text-white hover:text-teal-200">
@@ -481,13 +479,13 @@ export default function Home() {
                   Rue Essaada , Bab Ezzouar, Alger, 16001
                 </p>
                 <p className="text-sm mt-2 mb-4">+2136 65 87 98 32</p>
-                <p className="text-sm mt-2">contact@pharmaintex.dz</p>
+                <p className="text-sm mt-2">contact@pharmintex.dz</p>
               </div>
             </div>
           </div>
           <div className="border-t border-teal-600 pt-4 text-sm text-center">
             <p>
-              &copy; {new Date().getFullYear()} Pharmaintex. Tous droits
+              &copy; {new Date().getFullYear()} Pharmintex. Tous droits
               réservés.
             </p>
           </div>

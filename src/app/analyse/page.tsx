@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, Pen, Scan } from "lucide-react";
+import { Menu, Pen, Scan, Home } from "lucide-react";
+import Link from "next/link";
 
 import ActionCard from "@/components/action-card";
 import Image from "next/image";
@@ -22,7 +23,7 @@ export default function Analyse() {
             height={32}
             className="mr-2"
           />
-          <span className="font-bold text-white text-lg">PHARMAINTEX</span>
+          <span className="font-bold text-white text-lg">PHARMINTEX</span>
         </div>
         <div className="flex items-center gap-4">
           <UserAvatar initials="TA" />
@@ -34,6 +35,17 @@ export default function Analyse() {
 
       {/* Main Content */}
       <section className="container mx-auto px-6 py-12">
+        {/* Breadcrumb/Home Button Option */}
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-[#388075] hover:text-[#2d6b61] transition-colors"
+          >
+            <Home className="h-4 w-4" />
+            <span className="text-sm">← Retour à l'accueil</span>
+          </Link>
+        </div>
+
         <h2 className="text-2xl font-semibold text-[#3d8b78]">
           Vérifier les risques
         </h2>
@@ -51,7 +63,7 @@ export default function Analyse() {
           />
 
           <ActionCard
-            icon={Scan} // Updated to use Scan icon instead of Maximize
+            icon={Scan}
             title="Scanner une ordonnance"
             description="Utilisez la fonction de scan pour vérifier rapidement les risques associés à votre ordonnance."
             href="/under-construction"
