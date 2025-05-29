@@ -120,7 +120,7 @@ export default function PatientProfileForm() {
             className="inline-flex items-center gap-2 text-[#388075] hover:text-[#2d6b61] transition-colors"
           >
             <Home className="h-4 w-4" />
-            <span className="text-sm">← Retour à l'accueil</span>
+            <span className="text-sm">← Retour à l&apos;accueil</span>
           </Link>
         </div>
         <h1 className="text-2xl font-medium text-emerald-700">
