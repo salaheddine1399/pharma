@@ -99,10 +99,17 @@ export default function Home() {
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-600 mb-4">
                 Bienvenue sur Pharmintex
               </h1>
+              <p className="text-neutral-500 max-w-lg">
+                Votre allié numérique pour une analyse précise et sécurisée de
+                vos prescriptions médicales.
+              </p>
               <p className="text-neutral-500 mb-8 max-w-lg">
-                Votre outil d&apos;analyse des médicaments. Grâce à notre
-                technologie de pointe, nous vous offrons une analyse complète et
-                précise de toutes vos prescriptions médicales.
+                Grâce à notre technologie avancée, détectez rapidement les
+                interactions médicamenteuses, évitez les erreurs et optimisez la
+                sécurité de vos traitements. Simple, rapide et fiable,{" "}
+                <span className="italic font-medium">
+                  conçu spécialement pour les professionnels de santé
+                </span>
               </p>
               <Link href="/analyse">
                 <Button className="bg-teal-700 hover:bg-teal-800 text-white w-full sm:w-auto">
@@ -116,7 +123,7 @@ export default function Home() {
                 src="/hero-illustration.svg"
                 alt="Pharmaintex illustration"
                 width={500}
-                height={500}
+                height={300}
                 className="relative z-10 max-w-full h-auto"
               />
             </div>
@@ -280,9 +287,12 @@ export default function Home() {
                     C&apos;est quoi Pharmintex?
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600 pt-2">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
+                    Est une plateforme numérique algérienne spécialisée dans
+                    l&apos;analyse des ordonnances médicales. Elle permet de
+                    détecter les interactions médicamenteuses, de proposer des
+                    alternatives en cas de contre-indications, et de renforcer
+                    la sécurité des prescriptions — en particulier chez les
+                    patients polymédiqués.
                   </AccordionContent>
                 </AccordionItem>
 
@@ -291,21 +301,24 @@ export default function Home() {
                     Pour qui est destiné Pharmintex?
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600 pt-2">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
+                    PharminteX s&apos;adresse aux professionnels de santé
+                    (pharmaciens, médecins, infirmiers), ainsi qu&apos;aux
+                    étudiants en sciences de la santé souhaitant approfondir
+                    leurs connaissances en pharmacologie et en analyse
+                    thérapeutique.
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="item-3" className="border rounded-md p-2">
                   <AccordionTrigger className="text-gray-600 text-left font-medium">
-                    Quelles sont les différences notables utilisées par
-                    Pharmintex pour son fonctionnement?
+                    PharminteX remplace-t-elle un avis médical ?
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600 pt-2">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
+                    Non. PharminteX est un outil d&apos;aide à la décision conçu
+                    pour accompagner les professionnels dans l&apos;évaluation
+                    des prescriptions. Elle ne remplace pas un diagnostic
+                    médical, mais vient compléter l&apos;analyse clinique pour
+                    améliorer la sécurité du traitement.
                   </AccordionContent>
                 </AccordionItem>
 
@@ -315,9 +328,12 @@ export default function Home() {
                     abonnement?
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600 pt-2">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
+                    Oui, l&apos;accès à PharminteX nécessite un abonnement. Cela
+                    permet d&apos;assurer un service fiable, sécurisé et
+                    régulièrement mis à jour. Plusieurs formules sont proposées
+                    selon le profil de l&apos;utilisateur (professionnel de
+                    santé, étudiant, établissement), avec un accès complet à
+                    toutes les fonctionnalités.
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -479,7 +495,7 @@ export default function Home() {
                   Rue Essaada , Bab Ezzouar, Alger, 16001
                 </p>
                 <p className="text-sm mt-2 mb-4">+2136 65 87 98 32</p>
-                <p className="text-sm mt-2">contact@pharmintex.dz</p>
+                <p className="text-sm mt-2">pharmintex@gmail.com</p>
               </div>
             </div>
           </div>

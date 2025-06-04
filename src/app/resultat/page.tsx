@@ -183,12 +183,77 @@ function AnalysisResults() {
     fetchMedicationData();
   }, [searchParams]);
 
-  // Determine risk level based on interactions
-  const hasHighRiskInteractions = interactions.some(
-    (int) =>
-      int.type === "Association contre-indiquée" ||
-      int.type === "Associations déconseillées"
-  );
+  // Function to get risk level and data based on interactions
+  const getRiskData = () => {
+    if (interactions.length === 0) {
+      return {
+        percentage: "0%",
+        level: "Aucune interaction détectée",
+        color: "text-green-500",
+        bgColor: "bg-green-100",
+        description:
+          "Aucune interaction significative n'a été détectée entre ces médicaments.",
+        emoji: "✅",
+      };
+    }
+
+    // Check for highest risk level first
+    if (
+      interactions.some((int) => int.type === "Association contre-indiquée")
+    ) {
+      return {
+        percentage: "90%",
+        level: "Association contre-indiquée",
+        color: "text-red-500",
+        bgColor: "bg-red-100",
+        description:
+          "Les interactions médicamenteuses possibles entre ces produits sont considérées comme étant à haut risque.",
+        emoji: "❌",
+      };
+    }
+
+    if (interactions.some((int) => int.type === "Associations déconseillées")) {
+      return {
+        percentage: "50%",
+        level: "Association déconseillée",
+        color: "text-orange-500",
+        bgColor: "bg-orange-100",
+        description:
+          "Des interactions médicamenteuses importantes sont possibles entre ces produits.",
+        emoji: "⚠️",
+      };
+    }
+
+    if (
+      interactions.some(
+        (int) =>
+          int.type === "Associations faisant l’objet de précautions d’emploi"
+      )
+    ) {
+      return {
+        percentage: "30%",
+        level: "Précautions d'emploi",
+        color: "text-yellow-500",
+        bgColor: "bg-yellow-100",
+        description:
+          "Des précautions d'emploi sont nécessaires lors de l'utilisation conjointe de ces médicaments.",
+        emoji: "⚖️",
+      };
+    }
+
+    // Default case for other types of interactions
+    return {
+      percentage: "20%",
+      level: "À prendre en compte",
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+      description:
+        "Des interactions mineures sont possibles entre ces produits.",
+      emoji: "ℹ️",
+    };
+  };
+
+  const riskData = getRiskData();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -204,15 +269,21 @@ function AnalysisResults() {
                 Vous trouverez ci-dessous la liste des risques potentiels
               </p>
             </div>
-            <Button
-              asChild
-              className="mt-4 md:mt-0 bg-teal-600 hover:bg-teal-700"
-            >
-              <Link href="/add-profile">
-                Lancer une nouvelle analyse{" "}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            <div className="flex flex-col md:flex-row gap-3 mt-4 md:mt-0">
+              <Button
+                asChild
+                variant="outline"
+                className="border-teal-600 text-teal-600 hover:bg-teal-50"
+              >
+                <Link href="/">Retour à l&apos;accueil</Link>
+              </Button>
+              <Button asChild className="bg-teal-600 hover:bg-teal-700">
+                <Link href="/add-profile">
+                  Lancer une nouvelle analyse{" "}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -351,33 +422,26 @@ function AnalysisResults() {
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row items-center justify-between">
                       <div className="text-center md:text-left mb-4 md:mb-0">
-                        <div
-                          className={`text-7xl font-bold ${
-                            hasHighRiskInteractions
-                              ? "text-red-500"
-                              : "text-yellow-500"
-                          }`}
-                        >
-                          {hasHighRiskInteractions ? "90%" : "40%"}
+                        <div className="flex items-center justify-center md:justify-start mb-2">
+                          <div
+                            className={`text-7xl font-bold ${riskData.color}`}
+                          >
+                            {riskData.percentage}
+                          </div>
                         </div>
                         <div
-                          className={`font-medium text-xl ${
-                            hasHighRiskInteractions
-                              ? "text-red-500"
-                              : "text-yellow-500"
-                          }`}
+                          className={`font-medium text-xl ${riskData.color}`}
                         >
-                          {hasHighRiskInteractions
-                            ? "Risque élevé"
-                            : "Risque modéré"}
+                          {riskData.level}
                         </div>
                       </div>
-                      <div className="max-w-md text-gray-500 text-center md:text-right">
-                        {hasHighRiskInteractions
-                          ? "Les interactions médicamenteuses possibles entre ces produits sont considérées comme étant à haut risque."
-                          : interactions.length > 0
-                          ? "Des interactions médicamenteuses modérées sont possibles entre ces produits."
-                          : "Aucune interaction significative n'a été détectée entre ces médicaments."}
+                      <div className="max-w-md text-gray-600 text-center md:text-right">
+                        <div
+                          className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-2 ${riskData.bgColor} ${riskData.color}`}
+                        >
+                          Niveau d'interaction: {riskData.percentage}
+                        </div>
+                        <p className="text-gray-500">{riskData.description}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -412,7 +476,7 @@ function AnalysisResults() {
                       (int) => int.type === "Association contre-indiquée"
                     ) && (
                       <Badge className="px-4 py-2 text-base bg-red-500 hover:bg-red-600 rounded-full mr-2 mb-2">
-                        <span>Associations contre-indiquées</span>
+                        <span>Associations contre-indiquées ❌</span>
                         <div className="ml-2 bg-white text-red-500 rounded-full h-6 w-6 flex items-center justify-center font-bold text-sm">
                           {
                             interactions.filter(
@@ -428,7 +492,7 @@ function AnalysisResults() {
                       (int) => int.type === "Associations déconseillées"
                     ) && (
                       <Badge className="px-4 py-2 text-base bg-orange-500 hover:bg-orange-600 rounded-full mr-2 mb-2">
-                        <span>Associations déconseillées</span>
+                        <span>Associations déconseillées ⚠️</span>
                         <div className="ml-2 bg-white text-orange-500 rounded-full h-6 w-6 flex items-center justify-center font-bold text-sm">
                           {
                             interactions.filter(
@@ -443,7 +507,7 @@ function AnalysisResults() {
                       (int) => int.type === "Associations à prendre en compte"
                     ) && (
                       <Badge className="px-4 py-2 text-base bg-yellow-500 hover:bg-yellow-600 rounded-full mb-2">
-                        <span>Précautions d&apos;emploi</span>
+                        <span>Précautions d&apos;emploi ⚖️</span>
                         <div className="ml-2 bg-white text-yellow-500 rounded-full h-6 w-6 flex items-center justify-center font-bold text-sm">
                           {
                             interactions.filter(
@@ -464,59 +528,92 @@ function AnalysisResults() {
                       Interactions détectées
                     </h3>
                     <div className="space-y-4">
-                      {interactions.map((interaction, index) => (
-                        <Card
-                          key={index}
-                          className={`border-l-4 ${
-                            interaction.type === "Association contre-indiquée"
-                              ? "border-l-red-500"
-                              : interaction.type ===
-                                "Associations déconseillées"
-                              ? "border-l-orange-500"
-                              : "border-l-yellow-500"
-                          }`}
-                        >
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <h4 className="font-medium">
-                                {interaction.medication1} +{" "}
-                                {interaction.medication2}
-                              </h4>
-                              <Badge
-                                className={`${
-                                  interaction.type ===
-                                  "Association contre-indiquée"
-                                    ? "bg-red-100 text-red-800"
-                                    : interaction.type ===
-                                      "Associations déconseillées"
-                                    ? "bg-orange-100 text-orange-800"
-                                    : "bg-yellow-100 text-yellow-800"
-                                }`}
-                              >
-                                {interaction.type}
-                              </Badge>
-                            </div>
-                            <p className="text-gray-700">
-                              {interaction.effects}
-                            </p>
-                            {interaction.remarks && (
-                              <p className="text-gray-500 text-sm mt-2">
-                                {interaction.remarks}
+                      {interactions.map((interaction, index) => {
+                        // Function to get interaction styling and emoji
+                        const getInteractionStyle = (type: string) => {
+                          switch (type) {
+                            case "Association contre-indiquée":
+                              return {
+                                borderColor: "border-l-red-500",
+                                badgeColor: "bg-red-100 text-red-800",
+                                emoji: "❌",
+                              };
+                            case "Associations déconseillées":
+                              return {
+                                borderColor: "border-l-orange-500",
+                                badgeColor: "bg-orange-100 text-orange-800",
+                                emoji: "⚠️",
+                              };
+                            case "Associations à prendre en compte":
+                              return {
+                                borderColor: "border-l-yellow-500",
+                                badgeColor: "bg-yellow-100 text-yellow-800",
+                                emoji: "⚖️",
+                              };
+                            case "À prendre en compte":
+                              return {
+                                borderColor: "border-l-green-500",
+                                badgeColor: "bg-green-100 text-green-800",
+                                emoji: "ℹ️",
+                              };
+                            case "Associations faisant l’objet de précautions d’emploi":
+                              return {
+                                borderColor: "border-l-yellow-500",
+                                badgeColor: "bg-yellow-100 text-yellow-800",
+                                emoji: "⚖️",
+                              };
+                            default:
+                              return {
+                                borderColor: "border-l-gray-500",
+                                badgeColor: "bg-gray-100 text-gray-800",
+                                emoji: "ℹ️",
+                              };
+                          }
+                        };
+
+                        const style = getInteractionStyle(interaction.type);
+
+                        return (
+                          <Card
+                            key={index}
+                            className={`border-l-4 ${style.borderColor}`}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex justify-between items-start mb-2">
+                                <h4 className="font-medium">
+                                  {interaction.medication1} +{" "}
+                                  {interaction.medication2}
+                                </h4>
+                                <Badge className={style.badgeColor}>
+                                  {style.emoji} {interaction.type}
+                                </Badge>
+                              </div>
+                              <p className="text-gray-700">
+                                {interaction.effects}
                               </p>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
+                              {interaction.remarks && (
+                                <p className="text-gray-500 text-sm mt-2">
+                                  {interaction.remarks}
+                                </p>
+                              )}
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
                     </div>
                   </div>
                 ) : (
                   <div className="mb-6">
                     <Card>
                       <CardContent className="p-6 text-center">
-                        <p className="text-gray-500">
+                        <div className="text-6xl mb-4">✅</div>
+                        <p className="text-gray-500 text-lg font-medium mb-2">
                           Aucune interaction n&apos;a été détectée entre les
                           médicaments sélectionnés.
                         </p>
+                        <Badge className="bg-green-100 text-green-800 px-3 py-1">
+                          0% de risque d'interaction
+                        </Badge>
                       </CardContent>
                     </Card>
                   </div>

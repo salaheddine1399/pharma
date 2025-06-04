@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Plus, FileText, LogOut } from "lucide-react";
+import { Search, Plus, FileText, LogOut, Home } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -36,6 +36,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Menu Items */}
         <nav className="flex flex-col space-y-2 flex-grow">
+          <Link
+            href="/"
+            className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-teal-600"
+            onClick={onClose}
+          >
+            <Home className="h-5 w-5" />
+            <span>Retour à l&apos;accueil</span>
+          </Link>
           <Link
             href="/medicaments"
             className="flex items-center gap-3 p-3 rounded-full bg-[#D5F4EF] text-[#388075]"
