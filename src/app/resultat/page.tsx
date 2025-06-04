@@ -439,7 +439,7 @@ function AnalysisResults() {
                         <div
                           className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-2 ${riskData.bgColor} ${riskData.color}`}
                         >
-                          Niveau d'interaction: {riskData.percentage}
+                          Niveau d&apos;interaction: {riskData.percentage}
                         </div>
                         <p className="text-gray-500">{riskData.description}</p>
                       </div>
@@ -612,7 +612,7 @@ function AnalysisResults() {
                           médicaments sélectionnés.
                         </p>
                         <Badge className="bg-green-100 text-green-800 px-3 py-1">
-                          0% de risque d'interaction
+                          0% de risque d&apos;interaction
                         </Badge>
                       </CardContent>
                     </Card>
