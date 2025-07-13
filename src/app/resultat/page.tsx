@@ -55,6 +55,7 @@ function AnalysisResults() {
   }
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string | null>(null);
   const [patientProfile, setPatientProfile] = useState({
     pathologies: { renal: false, hepatic: false, other: false },
