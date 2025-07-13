@@ -93,8 +93,8 @@ export default function Home() {
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-white py-12">
-          <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
+        <section className="relative overflow-hidden bg-white ">
+          <div className="container mx-auto  flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 z-10 mb-8 md:mb-0">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-600 mb-4">
                 Bienvenue sur Pharmintex

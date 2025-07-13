@@ -53,27 +53,57 @@ function AnalysisResults() {
     effects: string;
     remarks: string;
   }
-
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [patientProfile, setPatientProfile] = useState({
-    pathologies: {
-      renal: false,
-      hepatic: false,
-      other: false,
-    },
+    pathologies: { renal: false, hepatic: false, other: false },
     gender: "",
     ageGroup: "",
     pregnancyStatus: "",
   });
 
+  // Static data from PDF
+  const staticInteractions: Interaction[] = [
+    {
+      medication1: "SERVAL (Sertraline) 50mg",
+      medication2: "ARIFY (Aripiprazole) 15mg",
+      type: "Précaution d'emploi",
+      effects:
+        "Risque modéré d'augmentation des taux plasmatiques d'aripiprazole (par inhibition modérée de CYP2D6). Risque rare mais grave : symptômes extrapyramidaux (akathisie), voire syndrome malin des neuroleptiques.",
+      remarks: "Surveillance clinique recommandée.",
+    },
+    {
+      medication1: "CLORAXENE (clorazépate) 10mg",
+      medication2: "ARIFY (Aripiprazole) 15mg",
+      type: "Précaution d'emploi",
+      effects:
+        "Risque de sédation excessive, hypotension, dépression respiratoire.",
+      remarks:
+        "Surveillance recommandée, surtout en cas d'association avec la clozapine ou par voie parentérale.",
+    },
+    {
+      medication1: "CLORAXENE (clorazépate) 10mg",
+      medication2: "ANTAG (oméprazole) 20mg",
+      type: "Prendre en compte",
+      effects:
+        "L'oméprazole peut inhiber le métabolisme des benzodiazépines oxydées comme le clorazépate (via CYP2C19), entraînant une accumulation et un risque accru de sédation ou de toxicité. Des cas de troubles de la marche et de coma prolongé ont été rapportés.",
+      remarks:
+        "Surveillance clinique et éventuelle réduction posologique du benzodiazépine recommandées.",
+    },
+  ];
+
+  const staticMeds = [
+    { cis: "n/a", atc: "", name: "SERVAL (Sertraline) 50mg" },
+    { cis: "n/a", atc: "", name: "ARIFY (Aripiprazole) 15mg" },
+    { cis: "n/a", atc: "", name: "CLORAXENE (clorazépate) 10mg" },
+    { cis: "n/a", atc: "", name: "ANTAG (oméprazole) 20mg" },
+  ];
+
   useEffect(() => {
-    // Check if we should show the sidebar
     const sidebarParam = searchParams.get("showSidebar");
     setShowSidebar(sidebarParam === "true");
 
-    // If sidebar should be shown, parse the patient profile data
     if (sidebarParam === "true") {
       const renal = searchParams.get("renal") === "true";
       const hepatic = searchParams.get("hepatic") === "true";
@@ -90,167 +120,142 @@ function AnalysisResults() {
       });
     }
 
-    const fetchMedicationData = async () => {
-      setIsLoading(true);
-      try {
-        const medCode0 = searchParams.get("medCode0");
-        const atcCode0 = searchParams.get("atcCode0");
-        const medCode1 = searchParams.get("medCode1");
-        const atcCode1 = searchParams.get("atcCode1");
+    // Load static results from PDF only
+    const staticInteractions = [
+      {
+        medication1: "SERVAL (Sertraline) 50mg",
+        medication2: "ARIFY (Aripiprazole) 15mg",
+        type: "Précaution d'emploi",
+        effects:
+          "Risque modéré d'augmentation des taux plasmatiques d'aripiprazole (par inhibition modérée de CYP2D6). Risque rare mais grave : symptômes extrapyramidaux (akathisie), voire syndrome malin des neuroleptiques.",
+        remarks: "Surveillance clinique recommandée.",
+      },
+      {
+        medication1: "CLORAXENE (clorazépate) 10mg",
+        medication2: "ARIFY (Aripiprazole) 15mg",
+        type: "Précaution d'emploi",
+        effects:
+          "Risque de sédation excessive, hypotension, dépression respiratoire.",
+        remarks:
+          "Surveillance recommandée, surtout en cas d'association avec la clozapine ou par voie parentérale.",
+      },
+      {
+        medication1: "CLORAXENE (clorazépate) 10mg",
+        medication2: "ANTAG (oméprazole) 20mg",
+        type: "Prendre en compte",
+        effects:
+          "L'oméprazole peut inhiber le métabolisme des benzodiazépines oxydées comme le clorazépate (via CYP2C19), entraînant une accumulation et un risque accru de sédation ou de toxicité. Des cas de troubles de la marche et de coma prolongé ont été rapportés.",
+        remarks:
+          "Surveillance clinique et éventuelle réduction posologique du benzodiazépine recommandées.",
+      },
+    ];
 
-        if (!medCode0 || !medCode1 || !atcCode0 || !atcCode1) {
-          setError("Medication codes and ATC codes are required");
-          setIsLoading(false);
-          return;
-        }
+    const staticMeds = [
+      { cis: "n/a", atc: "", name: "SERVAL (Sertraline) 50mg" },
+      { cis: "n/a", atc: "", name: "ARIFY (Aripiprazole) 15mg" },
+      { cis: "n/a", atc: "", name: "CLORAXENE (clorazépate) 10mg" },
+      { cis: "n/a", atc: "", name: "ANTAG (oméprazole) 20mg" },
+    ];
 
-        const { data: medsData, error: medsError } = await supabase
-          .from("medication_interactions")
-          .select("*")
-          .in("Code_CIS", [medCode0, medCode1]);
-
-        if (medsError || !medsData || medsData.length === 0) {
-          setError("No medication data found for the provided codes");
-          setIsLoading(false);
-          return;
-        }
-
-        const uniqueMeds = [
-          {
-            cis: medCode0,
-            atc: atcCode0,
-            name:
-              medsData.find((med) => med["Code_CIS"] === medCode0)?.DCI ||
-              medsData.find((med) => med["Code_CIS"] === medCode0)?.[
-                "Code_ATC"
-              ] ||
-              "Médicament 1",
-          },
-          {
-            cis: medCode1,
-            atc: atcCode1,
-            name:
-              medsData.find((med) => med["Code_CIS"] === medCode1)?.DCI ||
-              medsData.find((med) => med["Code_CIS"] === medCode1)?.[
-                "Code_ATC"
-              ] ||
-              "Médicament 2",
-          },
-        ];
-
-        setMedications(uniqueMeds);
-
-        const foundInteractions: Interaction[] = [];
-
-        // Look for interactions
-        const med1Interactions = medsData.filter(
-          (row) => row["Code_CIS"] === medCode1 && row["Code_ATC"] === atcCode0
-        );
-
-        med1Interactions.forEach((interaction) => {
-          foundInteractions.push({
-            medication1: uniqueMeds[0].name,
-            medication2: uniqueMeds[1].name,
-            type: interaction["Type_d_interaction"],
-            effects: interaction["Effets_indesirables"],
-            remarks: interaction.Remarque,
-          });
-        });
-
-        const med0Interactions = medsData.filter(
-          (row) => row["Code_CIS"] === medCode0 && row["Code_ATC"] === atcCode1
-        );
-
-        med0Interactions.forEach((interaction) => {
-          foundInteractions.push({
-            medication1: uniqueMeds[0].name,
-            medication2: uniqueMeds[1].name,
-            type: interaction["Type_d_interaction"],
-            effects: interaction["Effets_indesirables"],
-            remarks: interaction.Remarque,
-          });
-        });
-
-        setInteractions(foundInteractions);
-      } catch (err) {
-        console.error("Error fetching medication data:", err);
-        setError("Failed to load medication data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMedicationData();
+    setMedications(staticMeds);
+    setInteractions(staticInteractions);
+    setIsLoading(false);
   }, [searchParams]);
 
   // Function to get risk level and data based on interactions
   const getRiskData = () => {
-    if (interactions.length === 0) {
+    const interactionCount = interactions.length;
+
+    if (interactionCount === 0) {
       return {
-        percentage: "0%",
+        count: "0",
         level: "Aucune interaction détectée",
         color: "text-green-500",
         bgColor: "bg-green-100",
         description:
           "Aucune interaction significative n'a été détectée entre ces médicaments.",
         emoji: "✅",
+        breakdown: [],
       };
     }
 
-    // Check for highest risk level first
-    if (
-      interactions.some((int) => int.type === "Association contre-indiquée")
-    ) {
-      return {
-        percentage: "90%",
-        level: "Association contre-indiquée",
-        color: "text-red-500",
-        bgColor: "bg-red-100",
-        description:
-          "Les interactions médicamenteuses possibles entre ces produits sont considérées comme étant à haut risque.",
-        emoji: "❌",
-      };
+    // Count interactions by type
+    const majeurCount = interactions.filter(
+      (int) =>
+        int.type === "Association contre-indiquée" ||
+        int.type === "Associations déconseillées"
+    ).length;
+
+    const modereCount = interactions.filter(
+      (int) =>
+        int.type === "Associations faisant l'objet de précautions d'emploi" ||
+        int.type === "Précaution d'emploi"
+    ).length;
+
+    const mineurCount = interactions.filter(
+      (int) =>
+        int.type === "Prendre en compte" || int.type === "À prendre en compte"
+    ).length;
+
+    // Create breakdown array
+    const breakdown = [];
+    if (majeurCount > 0) breakdown.push(`Majeur (${majeurCount})`);
+    if (modereCount > 0) breakdown.push(`Modéré (${modereCount})`);
+    if (mineurCount > 0) breakdown.push(`Mineur (${mineurCount})`);
+
+    // Determine highest risk level for styling
+    let color = "text-green-600";
+    let bgColor = "bg-green-50";
+    let level = "À prendre en compte";
+    let emoji = "ℹ️";
+    let description = "Des interactions sont possibles entre ces produits.";
+
+    if (majeurCount > 0) {
+      color = "text-red-500";
+      bgColor = "bg-red-100";
+      level = "Risque élevé";
+      emoji = "❌";
+      description = "Des interactions majeures ont été détectées.";
+    } else if (modereCount > 0) {
+      color = "text-orange-500";
+      bgColor = "bg-orange-100";
+      level = "Risque modéré";
+      emoji = "⚠️";
+      description = "Des interactions modérées ont été détectées.";
+    } else if (mineurCount > 0) {
+      color = "text-yellow-500";
+      bgColor = "bg-yellow-100";
+      level = "Risque mineur";
+      emoji = "⚖️";
+      description = "Des interactions mineures ont été détectées.";
     }
 
-    if (interactions.some((int) => int.type === "Associations déconseillées")) {
-      return {
-        percentage: "50%",
-        level: "Association déconseillée",
-        color: "text-orange-500",
-        bgColor: "bg-orange-100",
-        description:
-          "Des interactions médicamenteuses importantes sont possibles entre ces produits.",
-        emoji: "⚠️",
-      };
-    }
-
-    if (
-      interactions.some(
-        (int) =>
-          int.type === "Associations faisant l’objet de précautions d’emploi"
-      )
-    ) {
-      return {
-        percentage: "30%",
-        level: "Précautions d'emploi",
-        color: "text-yellow-500",
-        bgColor: "bg-yellow-100",
-        description:
-          "Des précautions d'emploi sont nécessaires lors de l'utilisation conjointe de ces médicaments.",
-        emoji: "⚖️",
-      };
-    }
-
-    // Default case for other types of interactions
     return {
-      percentage: "20%",
-      level: "À prendre en compte",
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      description:
-        "Des interactions mineures sont possibles entre ces produits.",
-      emoji: "ℹ️",
+      count: interactionCount.toString(),
+      level,
+      color,
+      bgColor,
+      description,
+      emoji,
+      breakdown,
     };
+  };
+
+  // Function to determine if interaction is mineur, modéré, or majeur
+  const getInteractionSeverity = (type: string) => {
+    switch (type) {
+      case "Association contre-indiquée":
+      case "Associations déconseillées":
+        return "majeur";
+      case "Associations faisant l'objet de précautions d'emploi":
+      case "Précaution d'emploi":
+        return "modéré";
+      case "Prendre en compte":
+      case "À prendre en compte":
+        return "mineur";
+      default:
+        return "mineur";
+    }
   };
 
   const riskData = getRiskData();
@@ -426,20 +431,30 @@ function AnalysisResults() {
                           <div
                             className={`text-7xl font-bold ${riskData.color}`}
                           >
-                            {riskData.percentage}
+                            {riskData.count}
                           </div>
                         </div>
-                        <div
-                          className={`font-medium text-xl ${riskData.color}`}
-                        >
-                          {riskData.level}
+                        <div className="text-sm text-gray-600 mb-2">
+                          interactions détectées
                         </div>
+                        {riskData.breakdown.length > 0 && (
+                          <div className="space-y-1">
+                            {riskData.breakdown.map((item, index) => (
+                              <div
+                                key={index}
+                                className="text-sm text-gray-600"
+                              >
+                                • {item}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <div className="max-w-md text-gray-600 text-center md:text-right">
                         <div
                           className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-2 ${riskData.bgColor} ${riskData.color}`}
                         >
-                          Niveau d&apos;interaction: {riskData.percentage}
+                          Niveau d&apos;interaction: {riskData.level}
                         </div>
                         <p className="text-gray-500">{riskData.description}</p>
                       </div>
@@ -529,34 +544,20 @@ function AnalysisResults() {
                     </h3>
                     <div className="space-y-4">
                       {interactions.map((interaction, index) => {
-                        // Function to get interaction styling and emoji
-                        const getInteractionStyle = (type: string) => {
-                          switch (type) {
-                            case "Association contre-indiquée":
+                        const severity = getInteractionSeverity(
+                          interaction.type
+                        );
+
+                        // Function to get interaction styling and emoji based on severity
+                        const getInteractionStyle = (severity: string) => {
+                          switch (severity) {
+                            case "majeur":
                               return {
                                 borderColor: "border-l-red-500",
                                 badgeColor: "bg-red-100 text-red-800",
                                 emoji: "❌",
                               };
-                            case "Associations déconseillées":
-                              return {
-                                borderColor: "border-l-orange-500",
-                                badgeColor: "bg-orange-100 text-orange-800",
-                                emoji: "⚠️",
-                              };
-                            case "Associations à prendre en compte":
-                              return {
-                                borderColor: "border-l-yellow-500",
-                                badgeColor: "bg-yellow-100 text-yellow-800",
-                                emoji: "⚖️",
-                              };
-                            case "À prendre en compte":
-                              return {
-                                borderColor: "border-l-green-500",
-                                badgeColor: "bg-green-100 text-green-800",
-                                emoji: "ℹ️",
-                              };
-                            case "Associations faisant l’objet de précautions d’emploi":
+                            case "mineur":
                               return {
                                 borderColor: "border-l-yellow-500",
                                 badgeColor: "bg-yellow-100 text-yellow-800",
@@ -571,7 +572,7 @@ function AnalysisResults() {
                           }
                         };
 
-                        const style = getInteractionStyle(interaction.type);
+                        const style = getInteractionStyle(severity);
 
                         return (
                           <Card
@@ -585,7 +586,7 @@ function AnalysisResults() {
                                   {interaction.medication2}
                                 </h4>
                                 <Badge className={style.badgeColor}>
-                                  {style.emoji} {interaction.type}
+                                  {style.emoji} {severity}
                                 </Badge>
                               </div>
                               <p className="text-gray-700">
@@ -612,7 +613,7 @@ function AnalysisResults() {
                           médicaments sélectionnés.
                         </p>
                         <Badge className="bg-green-100 text-green-800 px-3 py-1">
-                          0% de risque d&apos;interaction
+                          0 interactions
                         </Badge>
                       </CardContent>
                     </Card>
