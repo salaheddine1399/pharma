@@ -16,7 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import supabase from "@/lib/supabase";
 
 // This is the main component that will be exported
 export default function AnalysisResultsPage() {
@@ -52,6 +51,7 @@ function AnalysisResults() {
     type: string;
     effects: string;
     remarks: string;
+    severity: string; // Added severity field
   }
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,12 +63,13 @@ function AnalysisResults() {
     pregnancyStatus: "",
   });
 
-  // Static data from PDF
+  // Static data from PDF with severity levels
   const staticInteractions: Interaction[] = [
     {
       medication1: "SERVAL (Sertraline) 50mg",
       medication2: "ARIFY (Aripiprazole) 15mg",
       type: "Précaution d'emploi",
+      severity: "Modéré",
       effects:
         "Risque modéré d'augmentation des taux plasmatiques d'aripiprazole (par inhibition modérée de CYP2D6). Risque rare mais grave : symptômes extrapyramidaux (akathisie), voire syndrome malin des neuroleptiques.",
       remarks: "Surveillance clinique recommandée.",
@@ -77,6 +78,7 @@ function AnalysisResults() {
       medication1: "CLORAXENE (clorazépate) 10mg",
       medication2: "ARIFY (Aripiprazole) 15mg",
       type: "Précaution d'emploi",
+      severity: "Modéré",
       effects:
         "Risque de sédation excessive, hypotension, dépression respiratoire.",
       remarks:
@@ -86,6 +88,7 @@ function AnalysisResults() {
       medication1: "CLORAXENE (clorazépate) 10mg",
       medication2: "ANTAG (oméprazole) 20mg",
       type: "Prendre en compte",
+      severity: "Mineur",
       effects:
         "L'oméprazole peut inhiber le métabolisme des benzodiazépines oxydées comme le clorazépate (via CYP2C19), entraînant une accumulation et un risque accru de sédation ou de toxicité. Des cas de troubles de la marche et de coma prolongé ont été rapportés.",
       remarks:
@@ -120,145 +123,51 @@ function AnalysisResults() {
       });
     }
 
-    // Load static results from PDF only
-    const staticInteractions = [
-      {
-        medication1: "SERVAL (Sertraline) 50mg",
-        medication2: "ARIFY (Aripiprazole) 15mg",
-        type: "Précaution d'emploi",
-        effects:
-          "Risque modéré d'augmentation des taux plasmatiques d'aripiprazole (par inhibition modérée de CYP2D6). Risque rare mais grave : symptômes extrapyramidaux (akathisie), voire syndrome malin des neuroleptiques.",
-        remarks: "Surveillance clinique recommandée.",
-      },
-      {
-        medication1: "CLORAXENE (clorazépate) 10mg",
-        medication2: "ARIFY (Aripiprazole) 15mg",
-        type: "Précaution d'emploi",
-        effects:
-          "Risque de sédation excessive, hypotension, dépression respiratoire.",
-        remarks:
-          "Surveillance recommandée, surtout en cas d'association avec la clozapine ou par voie parentérale.",
-      },
-      {
-        medication1: "CLORAXENE (clorazépate) 10mg",
-        medication2: "ANTAG (oméprazole) 20mg",
-        type: "Prendre en compte",
-        effects:
-          "L'oméprazole peut inhiber le métabolisme des benzodiazépines oxydées comme le clorazépate (via CYP2C19), entraînant une accumulation et un risque accru de sédation ou de toxicité. Des cas de troubles de la marche et de coma prolongé ont été rapportés.",
-        remarks:
-          "Surveillance clinique et éventuelle réduction posologique du benzodiazépine recommandées.",
-      },
-    ];
-
-    const staticMeds = [
-      { cis: "n/a", atc: "", name: "SERVAL (Sertraline) 50mg" },
-      { cis: "n/a", atc: "", name: "ARIFY (Aripiprazole) 15mg" },
-      { cis: "n/a", atc: "", name: "CLORAXENE (clorazépate) 10mg" },
-      { cis: "n/a", atc: "", name: "ANTAG (oméprazole) 20mg" },
-    ];
-
     setMedications(staticMeds);
     setInteractions(staticInteractions);
     setIsLoading(false);
   }, [searchParams]);
 
-  // Function to get risk level and data based on interactions
-  const getRiskData = () => {
-    const interactionCount = interactions.length;
-
-    if (interactionCount === 0) {
+  // Function to get interaction count and summary
+  const getInteractionSummary = () => {
+    if (interactions.length === 0) {
       return {
-        count: "0",
-        level: "Aucune interaction détectée",
-        color: "text-green-500",
-        bgColor: "bg-green-100",
+        count: 0,
+        totalInteractions: "Aucune interaction détectée",
+        interactionTypes: [],
+        mainColor: "text-green-500",
+        mainBgColor: "bg-green-100",
         description:
           "Aucune interaction significative n'a été détectée entre ces médicaments.",
-        emoji: "✅",
-        breakdown: [],
       };
     }
 
-    // Count interactions by type
-    const majeurCount = interactions.filter(
-      (int) =>
-        int.type === "Association contre-indiquée" ||
-        int.type === "Associations déconseillées"
+    const interactionTypes = [];
+    const precautionCount = interactions.filter(
+      (int) => int.type === "Précaution d'emploi"
+    ).length;
+    const toPonderCount = interactions.filter(
+      (int) => int.type === "Prendre en compte"
     ).length;
 
-    const modereCount = interactions.filter(
-      (int) =>
-        int.type === "Associations faisant l'objet de précautions d'emploi" ||
-        int.type === "Précaution d'emploi"
-    ).length;
-
-    const mineurCount = interactions.filter(
-      (int) =>
-        int.type === "Prendre en compte" || int.type === "À prendre en compte"
-    ).length;
-
-    // Create breakdown array
-    const breakdown = [];
-    if (majeurCount > 0) breakdown.push(`Majeur (${majeurCount})`);
-    if (modereCount > 0) breakdown.push(`Modéré (${modereCount})`);
-    if (mineurCount > 0) breakdown.push(`Mineur (${mineurCount})`);
-
-    // Determine highest risk level for styling
-    let color = "text-green-600";
-    let bgColor = "bg-green-50";
-    let level = "À prendre en compte";
-    let emoji = "ℹ️";
-    let description = "Des interactions sont possibles entre ces produits.";
-
-    if (majeurCount > 0) {
-      color = "text-red-500";
-      bgColor = "bg-red-100";
-      level = "Risque élevé";
-      emoji = "❌";
-      description = "Des interactions majeures ont été détectées.";
-    } else if (modereCount > 0) {
-      color = "text-orange-500";
-      bgColor = "bg-orange-100";
-      level = "Risque modéré";
-      emoji = "⚠️";
-      description = "Des interactions modérées ont été détectées.";
-    } else if (mineurCount > 0) {
-      color = "text-yellow-500";
-      bgColor = "bg-yellow-100";
-      level = "Risque mineur";
-      emoji = "⚖️";
-      description = "Des interactions mineures ont été détectées.";
+    if (precautionCount > 0) {
+      interactionTypes.push(`Précaution d'emploi (${precautionCount})`);
+    }
+    if (toPonderCount > 0) {
+      interactionTypes.push(`À prendre en compte (${toPonderCount})`);
     }
 
     return {
-      count: interactionCount.toString(),
-      level,
-      color,
-      bgColor,
-      description,
-      emoji,
-      breakdown,
+      count: interactions.length,
+      totalInteractions: `${interactions.length} interactions détectées`,
+      interactionTypes,
+      mainColor: "text-orange-500",
+      mainBgColor: "bg-orange-100",
+      description: "Des interactions ont été détectées entre ces médicaments.",
     };
   };
 
-  // Function to determine if interaction is mineur, modéré, or majeur
-  const getInteractionSeverity = (type: string) => {
-    switch (type) {
-      case "Association contre-indiquée":
-      case "Associations déconseillées":
-        return "majeur";
-      case "Associations faisant l'objet de précautions d'emploi":
-      case "Précaution d'emploi":
-        return "modéré";
-      case "Prendre en compte":
-      case "À prendre en compte":
-        return "mineur";
-      default:
-        return "mineur";
-    }
-  };
-
-  const riskData = getRiskData();
+  const interactionSummary = getInteractionSummary();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -422,41 +331,44 @@ function AnalysisResults() {
               </Card>
             ) : (
               <>
-                {/* Risk indicator */}
+                {/* Interaction Summary Card */}
                 <Card className="mb-6">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row items-center justify-between">
                       <div className="text-center md:text-left mb-4 md:mb-0">
                         <div className="flex items-center justify-center md:justify-start mb-2">
                           <div
-                            className={`text-7xl font-bold ${riskData.color}`}
+                            className={`text-7xl font-bold ${interactionSummary.mainColor}`}
                           >
-                            {riskData.count}
+                            {interactionSummary.count}
                           </div>
                         </div>
-                        <div className="text-sm text-gray-600 mb-2">
-                          interactions détectées
+                        <div
+                          className={`font-medium text-xl ${interactionSummary.mainColor}`}
+                        >
+                          {interactionSummary.totalInteractions}
                         </div>
-                        {riskData.breakdown.length > 0 && (
-                          <div className="space-y-1">
-                            {riskData.breakdown.map((item, index) => (
-                              <div
-                                key={index}
-                                className="text-sm text-gray-600"
-                              >
-                                • {item}
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </div>
                       <div className="max-w-md text-gray-600 text-center md:text-right">
-                        <div
-                          className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-2 ${riskData.bgColor} ${riskData.color}`}
-                        >
-                          Niveau d&apos;interaction: {riskData.level}
+                        <div className="space-y-2 mb-3">
+                          {interactionSummary.interactionTypes.map(
+                            (type, index) => (
+                              <div
+                                key={index}
+                                className={`inline-block px-3 py-1 rounded-full text-sm font-medium mr-2 ${
+                                  type.includes("Précaution")
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-green-100 text-green-800"
+                                }`}
+                              >
+                                {type}
+                              </div>
+                            )
+                          )}
                         </div>
-                        <p className="text-gray-500">{riskData.description}</p>
+                        <p className="text-gray-500">
+                          {interactionSummary.description}
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -484,58 +396,6 @@ function AnalysisResults() {
                   </div>
                 </div>
 
-                {/* Warning badges - only if interactions exist */}
-                {interactions.length > 0 && (
-                  <div className="mb-6">
-                    {interactions.some(
-                      (int) => int.type === "Association contre-indiquée"
-                    ) && (
-                      <Badge className="px-4 py-2 text-base bg-red-500 hover:bg-red-600 rounded-full mr-2 mb-2">
-                        <span>Associations contre-indiquées ❌</span>
-                        <div className="ml-2 bg-white text-red-500 rounded-full h-6 w-6 flex items-center justify-center font-bold text-sm">
-                          {
-                            interactions.filter(
-                              (int) =>
-                                int.type === "Association contre-indiquée"
-                            ).length
-                          }
-                        </div>
-                      </Badge>
-                    )}
-
-                    {interactions.some(
-                      (int) => int.type === "Associations déconseillées"
-                    ) && (
-                      <Badge className="px-4 py-2 text-base bg-orange-500 hover:bg-orange-600 rounded-full mr-2 mb-2">
-                        <span>Associations déconseillées ⚠️</span>
-                        <div className="ml-2 bg-white text-orange-500 rounded-full h-6 w-6 flex items-center justify-center font-bold text-sm">
-                          {
-                            interactions.filter(
-                              (int) => int.type === "Associations déconseillées"
-                            ).length
-                          }
-                        </div>
-                      </Badge>
-                    )}
-
-                    {interactions.some(
-                      (int) => int.type === "Associations à prendre en compte"
-                    ) && (
-                      <Badge className="px-4 py-2 text-base bg-yellow-500 hover:bg-yellow-600 rounded-full mb-2">
-                        <span>Précautions d&apos;emploi ⚖️</span>
-                        <div className="ml-2 bg-white text-yellow-500 rounded-full h-6 w-6 flex items-center justify-center font-bold text-sm">
-                          {
-                            interactions.filter(
-                              (int) =>
-                                int.type === "Associations à prendre en compte"
-                            ).length
-                          }
-                        </div>
-                      </Badge>
-                    )}
-                  </div>
-                )}
-
                 {/* Interactions listing */}
                 {interactions.length > 0 ? (
                   <div className="mb-6">
@@ -544,35 +404,34 @@ function AnalysisResults() {
                     </h3>
                     <div className="space-y-4">
                       {interactions.map((interaction, index) => {
-                        const severity = getInteractionSeverity(
-                          interaction.type
-                        );
-
                         // Function to get interaction styling and emoji based on severity
                         const getInteractionStyle = (severity: string) => {
                           switch (severity) {
-                            case "majeur":
-                              return {
-                                borderColor: "border-l-red-500",
-                                badgeColor: "bg-red-100 text-red-800",
-                                emoji: "❌",
-                              };
-                            case "mineur":
+                            case "Modéré":
                               return {
                                 borderColor: "border-l-yellow-500",
                                 badgeColor: "bg-yellow-100 text-yellow-800",
-                                emoji: "⚖️",
+                                severityBadgeColor: "bg-yellow-500 text-white",
+                                emoji: "⚠️",
+                              };
+                            case "Mineur":
+                              return {
+                                borderColor: "border-l-green-500",
+                                badgeColor: "bg-green-100 text-green-800",
+                                severityBadgeColor: "bg-green-500 text-white",
+                                emoji: "ℹ️",
                               };
                             default:
                               return {
                                 borderColor: "border-l-gray-500",
                                 badgeColor: "bg-gray-100 text-gray-800",
+                                severityBadgeColor: "bg-gray-500 text-white",
                                 emoji: "ℹ️",
                               };
                           }
                         };
 
-                        const style = getInteractionStyle(severity);
+                        const style = getInteractionStyle(interaction.severity);
 
                         return (
                           <Card
@@ -585,15 +444,20 @@ function AnalysisResults() {
                                   {interaction.medication1} +{" "}
                                   {interaction.medication2}
                                 </h4>
-                                <Badge className={style.badgeColor}>
-                                  {style.emoji} {severity}
-                                </Badge>
+                                <div className="flex flex-col items-end gap-1">
+                                  <Badge className={style.severityBadgeColor}>
+                                    {interaction.severity}
+                                  </Badge>
+                                  <Badge className={style.badgeColor}>
+                                    {style.emoji} {interaction.type}
+                                  </Badge>
+                                </div>
                               </div>
-                              <p className="text-gray-700">
+                              <p className="text-gray-700 mb-2">
                                 {interaction.effects}
                               </p>
                               {interaction.remarks && (
-                                <p className="text-gray-500 text-sm mt-2">
+                                <p className="text-gray-500 text-sm">
                                   {interaction.remarks}
                                 </p>
                               )}
@@ -613,7 +477,7 @@ function AnalysisResults() {
                           médicaments sélectionnés.
                         </p>
                         <Badge className="bg-green-100 text-green-800 px-3 py-1">
-                          0 interactions
+                          0 interactions détectées
                         </Badge>
                       </CardContent>
                     </Card>
